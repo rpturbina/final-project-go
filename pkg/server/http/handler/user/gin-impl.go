@@ -3,6 +3,7 @@ package user
 import (
 	"log"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -15,7 +16,7 @@ type UserHdlImpl struct {
 }
 
 func (u *UserHdlImpl) RegisterUserHdl(ctx *gin.Context) {
-	log.Printf("%T - RegisterUserHdl is invoked]\n", u)
+	log.Printf("%T - RegisterUserHdl is invoked\n", u)
 	defer log.Printf("%T - RegisterUserHdl executed\n", u)
 
 	log.Println("binding body payload from request")
@@ -73,6 +74,70 @@ func (u *UserHdlImpl) RegisterUserHdl(ctx *gin.Context) {
 			"username": result.UserName,
 		},
 	})
+}
+
+func (u *UserHdlImpl) GetUserByIdHdl(ctx *gin.Context) {
+	log.Printf("%T - GetUserByIdHdl is invoked\n", u)
+	defer log.Printf("%T - GetUserByIdHdl executed\n", u)
+
+	// get query params from url
+	userIdParam := ctx.Param("user_id")
+
+	// check user email from query params, if empty -> BAD_REQUEST
+	log.Println("check user email from quary params")
+
+	userId, err := strconv.ParseUint(userIdParam, 0, 64)
+
+	if err != nil {
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+			"code": 96,
+			"type": "BAD_REQUEST",
+			"invalid_arg": gin.H{
+				"error_type":    "INVALID_USER_ID_FORMAT",
+				"error_message": err.Error(),
+			},
+		})
+		return
+	}
+
+	// calling service/usecase for get user data by id
+	log.Println("calling get user by id service usecase")
+	result, errMsg := u.userUsecase.GetUserByIdSvc(ctx, userId)
+	if errMsg.Error != nil {
+		switch errMsg.Type {
+		case "INTERNAL_CONNECTION_PROBLEM":
+			ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+				"code": 99,
+				"type": "INTERNAL_SERVER_ERROR",
+				"invalid_arg": gin.H{
+					"error_type":    errMsg.Type,
+					"error_message": errMsg.Error.Error(),
+				},
+			})
+		case "USER_NOT_FOUND":
+			ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+				"code": 99,
+				"type": "BAD_REQUEST",
+				"invalid_arg": gin.H{
+					"error_type":    errMsg.Type,
+					"error_message": errMsg.Error.Error(),
+				},
+			})
+		}
+		return
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{
+		"code":    00,
+		"message": "user successfully registered",
+		"type":    "SUCCESS",
+		"data": gin.H{
+			"id":            result.ID,
+			"username":      result.UserName,
+			"social_medias": result.SocialMedias,
+		},
+	})
+
 }
 
 func NewUserHandler(userUsecase user.UserUsecase) user.UserHandler {

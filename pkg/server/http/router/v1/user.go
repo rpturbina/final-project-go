@@ -17,8 +17,13 @@ func (u *UserRouterImpl) post() {
 	u.routerGroup.POST("/register", u.userHandler.RegisterUserHdl)
 }
 
+func (u *UserRouterImpl) get() {
+	u.routerGroup.GET("/:user_id", u.userHandler.GetUserByIdHdl)
+}
+
 func (u *UserRouterImpl) Routers() {
 	u.post()
+	u.get()
 }
 
 func NewUserRouter(ginEngine engine.HttpServer, userHandler user.UserHandler) router.Router {

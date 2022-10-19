@@ -8,4 +8,5 @@ import (
 
 type UserUsecase interface {
 	RegisterUserSvc(ctx context.Context, user User) (result User, errMsg message.ErrorMessage)
+	GetUserByIdSvc(ctx context.Context, userId uint64) (result User, errMsg message.ErrorMessage)
 }
