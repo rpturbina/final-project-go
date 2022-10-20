@@ -137,9 +137,120 @@ func (u *UserHdlImpl) GetUserByIdHdl(ctx *gin.Context) {
 			"social_medias": result.SocialMedias,
 		},
 	})
-
 }
 
+func (u *UserHdlImpl) UpdateUserByIdHdl(ctx *gin.Context) {
+	log.Printf("%T - UpdateUserByIdHdl is invoked\n", u)
+	defer log.Printf("%T - UpdateUserByIdHdl executed\n", u)
+
+	stringUserIdFromAccessToken := ctx.Value("user").(string)
+
+	userIdFromAccessToken, _ := strconv.ParseUint(stringUserIdFromAccessToken, 0, 64)
+
+	result, errMsg := u.userUsecase.GetUserByIdSvc(ctx, userIdFromAccessToken)
+	_ = result
+	if errMsg.Error != nil {
+		switch errMsg.Type {
+		case "INTERNAL_CONNECTION_PROBLEM":
+			ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+				"code": 99,
+				"type": "INTERNAL_SERVER_ERROR",
+				"invalid_arg": gin.H{
+					"error_type":    errMsg.Type,
+					"error_message": errMsg.Error.Error(),
+				},
+			})
+		case "USER_NOT_FOUND":
+			ctx.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
+				"code": 97,
+				"type": "UNAUTHENTICATED",
+				"invalid_arg": gin.H{
+					"error_type":    errMsg.Type,
+					"error_message": errMsg.Error.Error(),
+				},
+			})
+		}
+		return
+	}
+
+	userIdParam := ctx.Param("user_id")
+
+	if userIdParam != stringUserIdFromAccessToken {
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+			"code": 97,
+			"type": "UNAUTHENTICATED",
+			"invalid_arg": gin.H{
+				"error_type":    "INVALID_USER_ID",
+				"error_message": "user id is invalid",
+			},
+		})
+		return
+	}
+
+	userId, err := strconv.ParseUint(userIdParam, 0, 64)
+
+	if err != nil {
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+			"code": 96,
+			"type": "BAD_REQUEST",
+			"invalid_arg": gin.H{
+				"error_type":    "INVALID_USER_ID_FORMAT",
+				"error_message": err.Error(),
+			},
+		})
+		return
+	}
+
+	var user user.User
+	if err := ctx.ShouldBindJSON(&user); err != nil {
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+			"code":    96,
+			"type":    "BAD_REQUEST",
+			"message": "Failed to bind payload",
+			"invalid_arg": gin.H{
+				"error_type":    "INVALID_FORMAT",
+				"error_message": err.Error(),
+			},
+		})
+		return
+	}
+
+	idToken, errMsg := u.userUsecase.UpdateUserByIdSvc(ctx, userId, user.Email, user.Username)
+
+	if errMsg.Error != nil {
+		switch errMsg.Type {
+		case "INTERNAL_CONNECTION_PROBLEM":
+			ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+				"code": 99,
+				"type": "INTERNAL_SERVER_ERROR",
+				"invalid_arg": gin.H{
+					"error_type":    errMsg.Type,
+					"error_message": errMsg.Error.Error(),
+				},
+			})
+		case "USER_NOT_FOUND":
+			ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+				"code": 99,
+				"type": "BAD_REQUEST",
+				"invalid_arg": gin.H{
+					"error_type":    errMsg.Type,
+					"error_message": errMsg.Error.Error(),
+				},
+			})
+		}
+		return
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{
+		"code":    01,
+		"message": "user updated successfully",
+		"type":    "ACCEPTED",
+		"data": gin.H{
+			"id_token": idToken,
+		},
+	})
+
+}
 func NewUserHandler(userUsecase user.UserUsecase) user.UserHandler {
 	return &UserHdlImpl{userUsecase: userUsecase}
 }

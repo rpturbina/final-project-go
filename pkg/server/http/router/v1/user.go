@@ -23,7 +23,7 @@ func (u *UserRouterImpl) get() {
 }
 
 func (u *UserRouterImpl) put() {
-	u.routerGroup.PUT("/:user_id", middleware.CheckJWTAuth)
+	u.routerGroup.PUT("/:user_id", middleware.CheckJWTAuth, u.userHandler.UpdateUserByIdHdl)
 }
 func (u *UserRouterImpl) Routers() {
 	u.get()

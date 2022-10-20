@@ -42,6 +42,19 @@ func (u *UserRepoImpl) GetUserById(ctx context.Context, userId uint64) (result u
 	return result, err
 }
 
+func (u *UserRepoImpl) UpdateUserById(ctx context.Context, userId uint64, email string, username string) (result user.User, err error) {
+	log.Printf("%T - UpdateUserById is invoked\n", u)
+	defer log.Printf("%T - UpdateUserById executed\n", u)
+
+	db := u.pgCln.GetClient()
+
+	err = db.Model(&result).Where("id = ?", userId).Updates(user.User{Email: email, Username: username}).Error
+
+	log.Println(result)
+
+	return result, err
+}
+
 func NewUserRepo(pgCln postgres.PostgresClient) user.UserRepo {
 	return &UserRepoImpl{pgCln: pgCln}
 }

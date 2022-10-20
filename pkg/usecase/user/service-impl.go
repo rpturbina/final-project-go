@@ -6,9 +6,13 @@ import (
 	"fmt"
 	"log"
 	"strings"
+	"time"
 
+	"github.com/google/uuid"
+	"github.com/rpturbina/final-project-go/pkg/domain/claim"
 	"github.com/rpturbina/final-project-go/pkg/domain/message"
 	"github.com/rpturbina/final-project-go/pkg/domain/user"
+	"github.com/rpturbina/final-project-go/pkg/usecase/crypto"
 )
 
 type UserUsecaseImpl struct {
@@ -78,6 +82,57 @@ func (u *UserUsecaseImpl) GetUserByIdSvc(ctx context.Context, userId uint64) (re
 	}
 
 	return result, errMsg
+}
+
+func (u *UserUsecaseImpl) UpdateUserByIdSvc(ctx context.Context, userId uint64, email string, username string) (idToken string, errMsg message.ErrorMessage) {
+	log.Printf("%T - UpdateUserByIdSvc is invoked\n", u)
+	defer log.Printf("%T - UpdateUserByIdSvc executed\n", u)
+
+	result, err := u.GetUserByIdSvc(ctx, userId)
+
+	if err.Error != nil {
+		log.Printf("error when fetching data from database: %s\n", err.Error.Error())
+		errMsg = message.ErrorMessage{
+			Error: err.Error,
+			Type:  "INTERNAL_CONNECTION_PROBLEM",
+		}
+		return idToken, errMsg
+	}
+
+	log.Println("checking user id")
+	if result.ID <= 0 {
+		log.Printf("user with id %v is not found", userId)
+
+		err.Error = fmt.Errorf("user with id %v is not found", userId)
+		errMsg = message.ErrorMessage{
+			Error: err.Error,
+			Type:  "USER_NOT_FOUND",
+		}
+		return idToken, errMsg
+	}
+
+	result, err.Error = u.userRepo.UpdateUserById(ctx, userId, email, username)
+
+	if err.Error != nil {
+		log.Printf("error when fetching data from database: %s\n", err.Error.Error())
+		errMsg = message.ErrorMessage{
+			Error: err.Error,
+			Type:  "INTERNAL_CONNECTION_PROBLEM",
+		}
+		return idToken, errMsg
+	}
+
+	result, err.Error = u.userRepo.GetUserById(ctx, userId)
+
+	claimId := claim.IDToken{
+		JWTID:    uuid.New(),
+		Username: result.Username,
+		Email:    result.Email,
+		DOB:      time.Time(result.DOB),
+	}
+	idToken, _ = crypto.CreateJWT(ctx, claimId)
+
+	return idToken, errMsg
 }
 
 func NewUserUsecase(userRepo user.UserRepo) user.UserUsecase {
