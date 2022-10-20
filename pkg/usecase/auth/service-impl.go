@@ -26,6 +26,7 @@ func (a *AuthUsecaseImpl) LoginUserSvc(ctx context.Context, username string, pas
 
 	if err != nil {
 		log.Printf("error when fetching data from database: %s\n", err.Error())
+		return accessToken, refreshToken, idToken, errMsg
 	}
 
 	comparePass := helpers.ComparePass(
@@ -44,10 +45,10 @@ func (a *AuthUsecaseImpl) LoginUserSvc(ctx context.Context, username string, pas
 	timeNow := time.Now()
 	claimAccess := claim.JWTToken{
 		JWTID:          uuid.New(),
-		Subject:        "CALMAN",
-		Issuer:         "go-fga.com",
-		Audience:       "user.go-fga.com",
-		Scope:          "user",
+		Subject:        result.Username,
+		Issuer:         "mygram.com",
+		Audience:       "user.mygram.com",
+		Scope:          "create update delete read",
 		Type:           "ACCESS_TOKEN",
 		IssuedAt:       timeNow.Unix(),
 		NotValidBefore: timeNow.Unix(),
@@ -58,10 +59,10 @@ func (a *AuthUsecaseImpl) LoginUserSvc(ctx context.Context, username string, pas
 
 	claimRefresh := claim.JWTToken{
 		JWTID:          uuid.New(),
-		Subject:        "CALMAN",
-		Issuer:         "go-fga.com",
-		Audience:       "user.go-fga.com",
-		Scope:          "user",
+		Subject:        result.Username,
+		Issuer:         "mygram.com",
+		Audience:       "user.mygram.com",
+		Scope:          "create update delete read",
 		Type:           "REFRESH_TOKEN",
 		IssuedAt:       timeNow.Unix(),
 		NotValidBefore: timeNow.Unix(),
