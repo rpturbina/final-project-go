@@ -150,8 +150,30 @@ func (u *UserHdlImpl) UpdateUserByIdHdl(ctx *gin.Context) {
 			"id_token": idToken,
 		},
 	})
-
 }
+
+func (u *UserHdlImpl) DeleteUserHdl(ctx *gin.Context) {
+	log.Printf("%T - DeleteUserHdl is invoked\n", u)
+	defer log.Printf("%T - DeleteUserHdl executed\n", u)
+
+	stringUserId := ctx.Value("user").(string)
+
+	userId, _ := strconv.ParseUint(stringUserId, 0, 64)
+
+	errMsg := u.userUsecase.DeleteUserSvc(ctx, userId)
+
+	if errMsg.Error != nil {
+		message.ErrorResponseSwitcher(ctx, errMsg)
+		return
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{
+		"code":    01,
+		"message": "user has been successfully deleted",
+		"type":    "ACCEPTED",
+	})
+}
+
 func NewUserHandler(userUsecase user.UserUsecase) user.UserHandler {
 	return &UserHdlImpl{userUsecase: userUsecase}
 }

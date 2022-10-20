@@ -27,15 +27,15 @@ func (u *UserRouterImpl) put() {
 	u.routerGroup.PUT("", u.authMiddleware.CheckJWTAuth, u.userHandler.UpdateUserByIdHdl)
 }
 
-// func (u *UserRouterImpl) delete() {
-// 	u.routerGroup.DELETE("", middleware.CheckJWTAuth)
-// }
+func (u *UserRouterImpl) delete() {
+	u.routerGroup.DELETE("", u.authMiddleware.CheckJWTAuth, u.userHandler.DeleteUserHdl)
+}
 
 func (u *UserRouterImpl) Routers() {
 	u.get()
 	u.post()
 	u.put()
-	// u.delete()
+	u.delete()
 }
 
 func NewUserRouter(ginEngine engine.HttpServer, userHandler user.UserHandler, authMiddleware middleware.AuthMiddleware) router.Router {

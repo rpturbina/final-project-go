@@ -185,6 +185,25 @@ func (u *UserUsecaseImpl) UpdateUserByIdSvc(ctx context.Context, userId uint64, 
 	return idToken, errMsg
 }
 
+func (u *UserUsecaseImpl) DeleteUserSvc(ctx context.Context, userId uint64) (errMsg message.ErrorMessage) {
+	log.Printf("%T - UpdateUserByIdSvc is invoked\n", u)
+	defer log.Printf("%T - UpdateUserByIdSvc executed\n", u)
+
+	log.Println("calling delete user repo")
+	err := u.userRepo.DeleteUser(ctx, userId)
+
+	if err != nil {
+		log.Printf("error when fetching data from database: %s\n", err.Error())
+		errMsg = message.ErrorMessage{
+			Error: err,
+			Type:  "INTERNAL_CONNECTION_PROBLEM",
+		}
+		return errMsg
+	}
+
+	return errMsg
+}
+
 func NewUserUsecase(userRepo user.UserRepo) user.UserUsecase {
 	return &UserUsecaseImpl{userRepo: userRepo}
 }
