@@ -6,6 +6,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/rpturbina/final-project-go/pkg/domain/auth"
+	"github.com/rpturbina/final-project-go/pkg/domain/message"
 	"github.com/rpturbina/final-project-go/pkg/domain/user"
 )
 
@@ -24,7 +25,7 @@ func (a *AuthHdlImpl) LoginUserHdl(ctx *gin.Context) {
 			"type":    "BAD_REQUEST",
 			"message": "Failed to bind payload",
 			"invalid_arg": gin.H{
-				"error_type":    "INVALID_FORMAT",
+				"error_type":    "INVALID_PAYLOAD",
 				"error_message": err.Error(),
 			},
 		})
@@ -34,26 +35,7 @@ func (a *AuthHdlImpl) LoginUserHdl(ctx *gin.Context) {
 	accessToken, refreshToken, idToken, errMsg := a.authUsecase.LoginUserSvc(ctx, user.Username, user.Password)
 
 	if errMsg.Error != nil {
-		switch errMsg.Type {
-		case "INTERNAL_CONNECTION_PROBLEM":
-			ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
-				"code": 99,
-				"type": "INTERNAL_SERVER_ERROR",
-				"invalid_arg": gin.H{
-					"error_type":    errMsg.Type,
-					"error_message": errMsg.Error.Error(),
-				},
-			})
-		case "WRONG_PASSWORD":
-			ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
-				"code": 97,
-				"type": "UNAUTHENTICATED",
-				"invalid_arg": gin.H{
-					"error_type":    errMsg.Type,
-					"error_message": errMsg.Error.Error(),
-				},
-			})
-		}
+		message.ErrorResponseSwitcher(ctx, errMsg)
 		return
 	}
 
@@ -76,26 +58,7 @@ func (a *AuthHdlImpl) GetRefreshTokenHdl(ctx *gin.Context) {
 	accessToken, refreshToken, idToken, errMsg := a.authUsecase.GetRefreshTokenSvc(ctx)
 
 	if errMsg.Error != nil {
-		switch errMsg.Type {
-		case "INTERNAL_CONNECTION_PROBLEM":
-			ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
-				"code": 99,
-				"type": "INTERNAL_SERVER_ERROR",
-				"invalid_arg": gin.H{
-					"error_type":    errMsg.Type,
-					"error_message": errMsg.Error.Error(),
-				},
-			})
-		case "USER_NOT_FOUND":
-			ctx.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
-				"code": 97,
-				"type": "UNAUTHENTICATED",
-				"invalid_arg": gin.H{
-					"error_type":    errMsg.Type,
-					"error_message": errMsg.Error.Error(),
-				},
-			})
-		}
+		message.ErrorResponseSwitcher(ctx, errMsg)
 		return
 	}
 

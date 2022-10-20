@@ -8,6 +8,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/asaskevich/govalidator"
 	"github.com/google/uuid"
 	"github.com/rpturbina/final-project-go/pkg/domain/claim"
 	"github.com/rpturbina/final-project-go/pkg/domain/message"
@@ -23,18 +24,57 @@ func (u *UserUsecaseImpl) RegisterUserSvc(ctx context.Context, user user.User) (
 	log.Printf("%T - RegisterUserSvc is invoked\n", u)
 	defer log.Printf("%T - RegisterUserSvc executed\n", u)
 
-	// TODO: creating error when username and email is already exist
+	// user input validation
+	if isValid, err := govalidator.ValidateStruct(user); !isValid {
+		switch err.Error() {
+		case "username is required":
+			errMsg := message.ErrorMessage{
+				Error: err,
+				Type:  "USERNAME_IS_EMPTY",
+			}
+			return user, errMsg
+		case "email is required":
+			errMsg := message.ErrorMessage{
+				Error: err,
+				Type:  "EMAIL_IS_EMPTY",
+			}
+			return user, errMsg
+		case "invalid email format":
+			errMsg := message.ErrorMessage{
+				Error: err,
+				Type:  "WRONG_EMAIL_FORMAT",
+			}
+			return user, errMsg
+		case "password is required":
+			errMsg := message.ErrorMessage{
+				Error: err,
+				Type:  "PASSWORD_IS_EMPTY",
+			}
+			return user, errMsg
+		case "password has to have a minimum length of 6 characters":
+			errMsg := message.ErrorMessage{
+				Error: err,
+				Type:  "INVALID_PASSWORD_FORMAT",
+			}
+			return user, errMsg
 
-	log.Println("create user to database")
+		default:
+			errMsg := message.ErrorMessage{
+				Error: err,
+				Type:  "INVALID_PAYLOAD",
+			}
+			return user, errMsg
+		}
+	}
+
+	log.Println("calling register user repo")
 	err := u.userRepo.RegisterUser(ctx, &user)
 	if err != nil {
-		log.Printf("error when creating user: %v\n", err.Error())
-
-		if strings.Contains(err.Error(), `duplicate key value violates unique constraint "idx_users_user_name"`) {
+		if strings.Contains(err.Error(), `duplicate key value violates unique constraint "idx_users_username"`) {
 			err = errors.New("username has already been registered")
 			errMsg := message.ErrorMessage{
 				Error: err,
-				Type:  "USER_REGISTERED",
+				Type:  "USERNAME_REGISTERED",
 			}
 			return user, errMsg
 		}
@@ -43,11 +83,21 @@ func (u *UserUsecaseImpl) RegisterUserSvc(ctx context.Context, user user.User) (
 			err = errors.New("email has already been registered")
 			errMsg := message.ErrorMessage{
 				Error: err,
-				Type:  "USER_REGISTERED",
+				Type:  "EMAIL_REGISTERED",
 			}
 
 			return user, errMsg
 		}
+
+	}
+
+	if err != nil {
+		log.Printf("error when fetching data from database: %s\n", err.Error())
+		errMsg = message.ErrorMessage{
+			Error: err,
+			Type:  "INTERNAL_CONNECTION_PROBLEM",
+		}
+		return result, errMsg
 	}
 
 	return user, errMsg
@@ -57,7 +107,7 @@ func (u *UserUsecaseImpl) GetUserByIdSvc(ctx context.Context, userId uint64) (re
 	log.Printf("%T - GetUserByIdSvc is invoked\n", u)
 	defer log.Printf("%T - GetUserByIdSvc executed\n", u)
 
-	log.Println("getting user from user repository")
+	log.Println("calling get user by id repo")
 	result, err := u.userRepo.GetUserById(ctx, userId)
 
 	if err != nil {
@@ -69,7 +119,6 @@ func (u *UserUsecaseImpl) GetUserByIdSvc(ctx context.Context, userId uint64) (re
 		return result, errMsg
 	}
 
-	log.Println("checking user id")
 	if result.ID <= 0 {
 		log.Printf("user with id %v is not found", userId)
 
@@ -88,41 +137,42 @@ func (u *UserUsecaseImpl) UpdateUserByIdSvc(ctx context.Context, userId uint64, 
 	log.Printf("%T - UpdateUserByIdSvc is invoked\n", u)
 	defer log.Printf("%T - UpdateUserByIdSvc executed\n", u)
 
-	result, err := u.GetUserByIdSvc(ctx, userId)
+	if email == "" {
+		errMsg := message.ErrorMessage{
+			Error: errors.New("email is required"),
+			Type:  "EMAIL_IS_EMPTY",
+		}
+		return idToken, errMsg
+	}
 
-	if err.Error != nil {
-		log.Printf("error when fetching data from database: %s\n", err.Error.Error())
+	// email validation
+	if !govalidator.IsEmail(email) {
+		errMsg := message.ErrorMessage{
+			Error: errors.New("invalid email format"),
+			Type:  "WRONG_EMAIL_FORMAT",
+		}
+		return idToken, errMsg
+	}
+
+	// username validation
+	if username == "" {
+		errMsg := message.ErrorMessage{
+			Error: errors.New("username is required"),
+			Type:  "USERNAME_IS_EMPTY",
+		}
+		return idToken, errMsg
+	}
+
+	result, err := u.userRepo.UpdateUserById(ctx, userId, email, username)
+
+	if err != nil {
+		log.Printf("error when fetching data from database: %s\n", err.Error())
 		errMsg = message.ErrorMessage{
-			Error: err.Error,
+			Error: err,
 			Type:  "INTERNAL_CONNECTION_PROBLEM",
 		}
 		return idToken, errMsg
 	}
-
-	log.Println("checking user id")
-	if result.ID <= 0 {
-		log.Printf("user with id %v is not found", userId)
-
-		err.Error = fmt.Errorf("user with id %v is not found", userId)
-		errMsg = message.ErrorMessage{
-			Error: err.Error,
-			Type:  "USER_NOT_FOUND",
-		}
-		return idToken, errMsg
-	}
-
-	result, err.Error = u.userRepo.UpdateUserById(ctx, userId, email, username)
-
-	if err.Error != nil {
-		log.Printf("error when fetching data from database: %s\n", err.Error.Error())
-		errMsg = message.ErrorMessage{
-			Error: err.Error,
-			Type:  "INTERNAL_CONNECTION_PROBLEM",
-		}
-		return idToken, errMsg
-	}
-
-	result, err.Error = u.userRepo.GetUserById(ctx, userId)
 
 	claimId := claim.IDToken{
 		JWTID:    uuid.New(),

@@ -13,21 +13,37 @@ import (
 	"github.com/rpturbina/final-project-go/pkg/domain/auth"
 	"github.com/rpturbina/final-project-go/pkg/domain/claim"
 	"github.com/rpturbina/final-project-go/pkg/domain/message"
+	"github.com/rpturbina/final-project-go/pkg/domain/user"
 	"github.com/rpturbina/final-project-go/pkg/usecase/crypto"
 )
 
 type AuthUsecaseImpl struct {
 	authRepo auth.AuthRepo
+	userRepo user.UserRepo
 }
 
 func (a *AuthUsecaseImpl) LoginUserSvc(ctx context.Context, username string, password string) (accessToken string, refreshToken string, idToken string, errMsg message.ErrorMessage) {
 	log.Printf("%T - LoginUserSvc is invoked\n", a)
 	defer log.Printf("%T - LoginUserSvc executed\n", a)
 
+	log.Println("calling login user repo")
 	result, err := a.authRepo.LoginUser(ctx, username)
+
+	if result.ID <= 0 {
+		err = errors.New("user not found")
+		errMsg = message.ErrorMessage{
+			Error: err,
+			Type:  "USER_NOT_FOUND",
+		}
+		return accessToken, refreshToken, idToken, errMsg
+	}
 
 	if err != nil {
 		log.Printf("error when fetching data from database: %s\n", err.Error())
+		errMsg = message.ErrorMessage{
+			Error: err,
+			Type:  "INTERNAL_CONNECTION_PROBLEM",
+		}
 		return accessToken, refreshToken, idToken, errMsg
 	}
 
@@ -36,7 +52,7 @@ func (a *AuthUsecaseImpl) LoginUserSvc(ctx context.Context, username string, pas
 	)
 
 	if !comparePass {
-		err := errors.New("invalid email or password")
+		err := errors.New("invalid username or password")
 		errMsg = message.ErrorMessage{
 			Error: err,
 			Type:  "WRONG_PASSWORD",
@@ -84,23 +100,14 @@ func (a *AuthUsecaseImpl) LoginUserSvc(ctx context.Context, username string, pas
 }
 
 func (a *AuthUsecaseImpl) GetRefreshTokenSvc(ctx context.Context) (accessToken string, refreshToken string, idToken string, errMsg message.ErrorMessage) {
+	log.Printf("%T - GetRefreshTokenSvc is invoked\n", a)
+	defer log.Printf("%T - GetRefreshTokenSvc executed\n", a)
 
 	stringUserId := ctx.Value("user").(string)
 
 	userId, _ := strconv.ParseUint(stringUserId, 0, 64)
 
-	result, err := a.authRepo.CheckUserById(ctx, userId)
-
-	if result.ID <= 0 {
-		log.Printf("user with id %v is not found", userId)
-
-		err = fmt.Errorf("user with id %v is not found", userId)
-		errMsg = message.ErrorMessage{
-			Error: err,
-			Type:  "USER_NOT_FOUND",
-		}
-		return accessToken, refreshToken, idToken, errMsg
-	}
+	result, err := a.userRepo.GetUserById(ctx, userId)
 
 	if err != nil {
 		log.Printf("error when fetching data from database: %s\n", err.Error())
@@ -146,6 +153,6 @@ func (a *AuthUsecaseImpl) GetRefreshTokenSvc(ctx context.Context) (accessToken s
 	return accessToken, refreshToken, idToken, errMsg
 }
 
-func NewAuthUsecase(authRepo auth.AuthRepo) auth.AuthUsecase {
-	return &AuthUsecaseImpl{authRepo: authRepo}
+func NewAuthUsecase(authRepo auth.AuthRepo, userRepo user.UserRepo) auth.AuthUsecase {
+	return &AuthUsecaseImpl{authRepo: authRepo, userRepo: userRepo}
 }

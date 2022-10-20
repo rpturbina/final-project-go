@@ -11,6 +11,7 @@ import (
 	userrepo "github.com/rpturbina/final-project-go/pkg/repository/user"
 	authhandler "github.com/rpturbina/final-project-go/pkg/server/http/handler/auth"
 	userhandler "github.com/rpturbina/final-project-go/pkg/server/http/handler/user"
+	"github.com/rpturbina/final-project-go/pkg/server/http/middleware"
 	router "github.com/rpturbina/final-project-go/pkg/server/http/router/v1"
 	authusecase "github.com/rpturbina/final-project-go/pkg/usecase/auth"
 	userusecase "github.com/rpturbina/final-project-go/pkg/usecase/user"
@@ -47,11 +48,13 @@ func main() {
 	userHandler := userhandler.NewUserHandler(userUsecase)
 
 	authRepo := authrepo.NewAuthRepo(postgresCln)
-	authUsecase := authusecase.NewAuthUsecase(authRepo)
+	authUsecase := authusecase.NewAuthUsecase(authRepo, userRepo)
 	authHandler := authhandler.NewAuthHandler(authUsecase)
 
-	router.NewUserRouter(ginEngine, userHandler).Routers()
-	router.NewAuthRouter(ginEngine, authHandler).Routers()
+	authMiddleware := middleware.NewAuthMiddleware(userUsecase)
+
+	router.NewUserRouter(ginEngine, userHandler, authMiddleware).Routers()
+	router.NewAuthRouter(ginEngine, authHandler, authMiddleware).Routers()
 
 	ginEngine.Serve()
 }

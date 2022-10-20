@@ -9,9 +9,10 @@ import (
 )
 
 type UserRouterImpl struct {
-	ginEngine   engine.HttpServer
-	routerGroup *gin.RouterGroup
-	userHandler user.UserHandler
+	ginEngine      engine.HttpServer
+	routerGroup    *gin.RouterGroup
+	userHandler    user.UserHandler
+	authMiddleware middleware.AuthMiddleware
 }
 
 func (u *UserRouterImpl) post() {
@@ -23,15 +24,21 @@ func (u *UserRouterImpl) get() {
 }
 
 func (u *UserRouterImpl) put() {
-	u.routerGroup.PUT("/:user_id", middleware.CheckJWTAuth, u.userHandler.UpdateUserByIdHdl)
+	u.routerGroup.PUT("", u.authMiddleware.CheckJWTAuth, u.userHandler.UpdateUserByIdHdl)
 }
+
+// func (u *UserRouterImpl) delete() {
+// 	u.routerGroup.DELETE("", middleware.CheckJWTAuth)
+// }
+
 func (u *UserRouterImpl) Routers() {
 	u.get()
 	u.post()
 	u.put()
+	// u.delete()
 }
 
-func NewUserRouter(ginEngine engine.HttpServer, userHandler user.UserHandler) router.Router {
+func NewUserRouter(ginEngine engine.HttpServer, userHandler user.UserHandler, authMiddleware middleware.AuthMiddleware) router.Router {
 	routerGroup := ginEngine.GetGin().Group("/api/mygram/v1/users")
-	return &UserRouterImpl{ginEngine: ginEngine, routerGroup: routerGroup, userHandler: userHandler}
+	return &UserRouterImpl{ginEngine: ginEngine, routerGroup: routerGroup, userHandler: userHandler, authMiddleware: authMiddleware}
 }

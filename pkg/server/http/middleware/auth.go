@@ -2,14 +2,24 @@ package middleware
 
 import (
 	"net/http"
+	"strconv"
 	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/rpturbina/final-project-go/pkg/domain/user"
 	"github.com/rpturbina/final-project-go/pkg/usecase/crypto"
 )
 
-func CheckJWTAuth(ctx *gin.Context) {
+type AuthMiddleware interface {
+	CheckJWTAuth(ctx *gin.Context)
+}
+
+type AuthMiddlewareImpl struct {
+	userUsecase user.UserUsecase
+}
+
+func (m *AuthMiddlewareImpl) CheckJWTAuth(ctx *gin.Context) {
 	headerToken := ctx.Request.Header.Get("Authorization")
 	bearer := strings.HasPrefix(headerToken, "Bearer")
 
@@ -23,7 +33,35 @@ func CheckJWTAuth(ctx *gin.Context) {
 
 	stringToken := strings.Split(headerToken, " ")[1]
 
-	claim := crypto.VerifyJWT(ctx, stringToken)
+	claim, err := crypto.VerifyJWT(ctx, stringToken)
+
+	if err != nil {
+		ctx.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
+			"code": 97,
+			"type": "UNAUTHENTICATED",
+			"invalid_arg": gin.H{
+				"error_type":    "INVALID_TOKEN",
+				"error_message": err.Error(),
+			},
+		})
+		return
+	}
+
+	userId, _ := strconv.ParseUint(claim.Subject, 0, 64)
+
+	_, errMsg := m.userUsecase.GetUserByIdSvc(ctx, userId)
+
+	if errMsg.Error != nil {
+		ctx.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
+			"code": 97,
+			"type": "UNAUTHENTICATED",
+			"invalid_arg": gin.H{
+				"error_type":    "USER_NOT_FOUND",
+				"error_message": errMsg.Error.Error(),
+			},
+		})
+		return
+	}
 
 	// validate claim
 	if claim.Issuer != "mygram.com" {
@@ -68,4 +106,8 @@ func CheckJWTAuth(ctx *gin.Context) {
 
 	ctx.Set("user", claim.Subject)
 	ctx.Next()
+}
+
+func NewAuthMiddleware(userUsecase user.UserUsecase) AuthMiddleware {
+	return &AuthMiddlewareImpl{userUsecase: userUsecase}
 }

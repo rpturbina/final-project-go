@@ -6,6 +6,7 @@ import (
 
 	"github.com/rpturbina/final-project-go/config/postgres"
 	"github.com/rpturbina/final-project-go/pkg/domain/user"
+	"gorm.io/gorm/clause"
 )
 
 type UserRepoImpl struct {
@@ -48,11 +49,28 @@ func (u *UserRepoImpl) UpdateUserById(ctx context.Context, userId uint64, email 
 
 	db := u.pgCln.GetClient()
 
-	err = db.Model(&result).Where("id = ?", userId).Updates(user.User{Email: email, Username: username}).Error
+	err = db.Model(&result).Clauses(clause.Returning{}).Where("id = ?", userId).Updates(user.User{Email: email, Username: username}).Error
 
-	log.Println(result)
+	if err != nil {
+		log.Printf("error when updating user by id %v\n", userId)
+	}
 
 	return result, err
+}
+
+func (u *UserRepoImpl) DeleteUser(ctx context.Context, userId uint64) (err error) {
+	log.Printf("%T - DeleteUser is invoked\n", u)
+	defer log.Printf("%T - DeleteUser executed\n", u)
+
+	db := u.pgCln.GetClient()
+
+	err = db.Where("id = ?", userId).Delete(&user.User{}).Error
+
+	if err != nil {
+		log.Printf("error when deleting user by id %v \n", userId)
+	}
+
+	return err
 }
 
 func NewUserRepo(pgCln postgres.PostgresClient) user.UserRepo {

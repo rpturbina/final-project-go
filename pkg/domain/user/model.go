@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"time"
 
-	"github.com/asaskevich/govalidator"
 	"github.com/rpturbina/final-project-go/helpers"
 	"github.com/rpturbina/final-project-go/pkg/domain/comment"
 	"github.com/rpturbina/final-project-go/pkg/domain/gormmodel"
@@ -34,27 +33,16 @@ func (mt *customTime) UnmarshalJSON(bs []byte) error {
 
 type User struct {
 	gormmodel.GormModel
-	Username string `gorm:"not null;uniqueIndex" json:"username" valid:"required~Your username is required"`
-	Email    string `gorm:"not null;uniqueIndex" json:"email" valid:"required~Your email is required,email~Invalid email format"`
-	Password string `gorm:"not null" json:"password" valid:"required~Your password is required,minstringlength(6)~Password has to have a minimum length of 6 characters"`
-	// TODO: give validation the minimum age is above 8
-	DOB    customTime    `gorm:"not null" json:"dob" valid:"required~Your dob is required"`
-	Photos []photo.Photo `json:"photos"`
-	// TODO: give comments and socialmedia field tags
+	Username     string                    `gorm:"not null;uniqueIndex" json:"username" valid:"required~username is required"`
+	Email        string                    `gorm:"not null;uniqueIndex" json:"email" valid:"required~email is required,email~invalid email format"`
+	Password     string                    `gorm:"not null" json:"password" valid:"required~password is required,minstringlength(6)~password has to have a minimum length of 6 characters"`
+	DOB          customTime                `gorm:"not null;type:date" json:"dob" valid:"required~date of birth is required"`
+	Photos       []photo.Photo             `json:"photos"`
 	Comments     []comment.Comment         `json:"comments"`
 	SocialMedias []socialmedia.SocialMedia `json:"social_medias"`
 }
 
 func (u *User) BeforeCreate(tx *gorm.DB) (err error) {
-	_, errCreate := govalidator.ValidateStruct(u)
-
-	if errCreate != nil {
-		err = errCreate
-		return
-	}
-
 	u.Password = helpers.HashPass(u.Password)
-
-	err = nil
 	return
 }
