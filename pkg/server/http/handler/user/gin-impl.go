@@ -71,7 +71,7 @@ func (u *UserHdlImpl) RegisterUserHdl(ctx *gin.Context) {
 			"age":      currentAge,
 			"email":    result.Email,
 			"id":       result.ID,
-			"username": result.UserName,
+			"username": result.Username,
 		},
 	})
 }
@@ -133,7 +133,7 @@ func (u *UserHdlImpl) GetUserByIdHdl(ctx *gin.Context) {
 		"type":    "SUCCESS",
 		"data": gin.H{
 			"id":            result.ID,
-			"username":      result.UserName,
+			"username":      result.Username,
 			"social_medias": result.SocialMedias,
 		},
 	})

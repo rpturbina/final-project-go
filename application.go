@@ -7,9 +7,12 @@ import (
 	"github.com/gin-gonic/gin"
 	engine "github.com/rpturbina/final-project-go/config/gin"
 	"github.com/rpturbina/final-project-go/config/postgres"
+	authrepo "github.com/rpturbina/final-project-go/pkg/repository/auth"
 	userrepo "github.com/rpturbina/final-project-go/pkg/repository/user"
+	authhandler "github.com/rpturbina/final-project-go/pkg/server/http/handler/auth"
 	userhandler "github.com/rpturbina/final-project-go/pkg/server/http/handler/user"
 	router "github.com/rpturbina/final-project-go/pkg/server/http/router/v1"
+	authusecase "github.com/rpturbina/final-project-go/pkg/usecase/auth"
 	userusecase "github.com/rpturbina/final-project-go/pkg/usecase/user"
 )
 
@@ -43,7 +46,12 @@ func main() {
 	userUsecase := userusecase.NewUserUsecase(userRepo)
 	userHandler := userhandler.NewUserHandler(userUsecase)
 
+	authRepo := authrepo.NewAuthRepo(postgresCln)
+	authUsecase := authusecase.NewAuthUsecase(authRepo)
+	authHandler := authhandler.NewAuthHandler(authUsecase)
+
 	router.NewUserRouter(ginEngine, userHandler).Routers()
+	router.NewAuthRouter(ginEngine, authHandler).Routers()
 
 	ginEngine.Serve()
 }

@@ -34,7 +34,7 @@ func (mt *customTime) UnmarshalJSON(bs []byte) error {
 
 type User struct {
 	gormmodel.GormModel
-	UserName string `gorm:"not null;uniqueIndex" json:"username" valid:"required~Your username is required"`
+	Username string `gorm:"not null;uniqueIndex" json:"username" valid:"required~Your username is required"`
 	Email    string `gorm:"not null;uniqueIndex" json:"email" valid:"required~Your email is required,email~Invalid email format"`
 	Password string `gorm:"not null" json:"password" valid:"required~Your password is required,minstringlength(6)~Password has to have a minimum length of 6 characters"`
 	// TODO: give validation the minimum age is above 8
