@@ -10,6 +10,7 @@ import (
 	"github.com/rpturbina/final-project-go/pkg/domain/user"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
 )
 
 type Config struct {
@@ -36,14 +37,14 @@ func (p *PostgresClientImpl) GetClient() *gorm.DB {
 func NewPostgresConnection(config Config) PostgresClient {
 	connectionConfig := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s", config.Host, config.Port, config.User, config.Password, config.DatabaseName)
 
-	db, err := gorm.Open(postgres.Open(connectionConfig), &gorm.Config{})
+	db, err := gorm.Open(postgres.Open(connectionConfig), &gorm.Config{Logger: logger.Default.LogMode(logger.Info)})
 
 	if err != nil {
 		log.Fatal("error connection to database:", err)
 	}
 
 	fmt.Println("database connection is successfully connected")
-	db.Debug().AutoMigrate(&user.User{}, &photo.Photo{}, &comment.Comment{}, &socialmedia.SocialMedia{})
+	db.AutoMigrate(&user.User{}, &photo.Photo{}, &comment.Comment{}, &socialmedia.SocialMedia{})
 
 	return &PostgresClientImpl{cln: db, config: config}
 }

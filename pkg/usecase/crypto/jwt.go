@@ -13,12 +13,6 @@ var (
 
 func CreateJWT(ctx context.Context, claim any) (string, error) {
 
-	// expected:
-	// 1. function ini akan membuat jwt token
-	// 2. jtw token akan berbeda disetiap claim
-	// 3. tidak ada error yang terjadi ketika token berhasil dibuat
-	// 4. error akan terjadi ketika claim tidak sesuai dengan format (json)
-
 	token, err := jwt.Sign(jwt.HS256, sharedKey, claim)
 	if err != nil {
 		return "", err
@@ -28,9 +22,7 @@ func CreateJWT(ctx context.Context, claim any) (string, error) {
 
 func VerifyJWT(ctx context.Context, token string) (claims claim.JWTToken) {
 
-	// Verify and extract claims from a token:
 	verifiedToken, err := jwt.Verify(jwt.HS256, sharedKey, []byte(token))
-	// unverifiedToken, err := jwt.Decode([]byte(token))
 	if err != nil {
 		panic(err)
 	}

@@ -4,6 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 	engine "github.com/rpturbina/final-project-go/config/gin"
 	"github.com/rpturbina/final-project-go/pkg/domain/auth"
+	"github.com/rpturbina/final-project-go/pkg/server/http/middleware"
 	"github.com/rpturbina/final-project-go/pkg/server/http/router"
 )
 
@@ -15,6 +16,7 @@ type AuthRouterImpl struct {
 
 func (a *AuthRouterImpl) post() {
 	a.routerGroup.POST("/login", a.authHandler.LoginUserHdl)
+	a.routerGroup.POST("/refresh", middleware.CheckJWTAuth, a.authHandler.GetRefreshTokenHdl)
 }
 
 func (a *AuthRouterImpl) Routers() {

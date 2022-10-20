@@ -4,6 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 	engine "github.com/rpturbina/final-project-go/config/gin"
 	"github.com/rpturbina/final-project-go/pkg/domain/user"
+	"github.com/rpturbina/final-project-go/pkg/server/http/middleware"
 	"github.com/rpturbina/final-project-go/pkg/server/http/router"
 )
 
@@ -21,9 +22,13 @@ func (u *UserRouterImpl) get() {
 	u.routerGroup.GET("/:user_id", u.userHandler.GetUserByIdHdl)
 }
 
+func (u *UserRouterImpl) put() {
+	u.routerGroup.PUT("/:user_id", middleware.CheckJWTAuth)
+}
 func (u *UserRouterImpl) Routers() {
-	u.post()
 	u.get()
+	u.post()
+	u.put()
 }
 
 func NewUserRouter(ginEngine engine.HttpServer, userHandler user.UserHandler) router.Router {

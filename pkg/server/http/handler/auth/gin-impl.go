@@ -69,6 +69,49 @@ func (a *AuthHdlImpl) LoginUserHdl(ctx *gin.Context) {
 	})
 }
 
+func (a *AuthHdlImpl) GetRefreshTokenHdl(ctx *gin.Context) {
+	log.Printf("%T - GetRefreshTokenHdl is invoked\n", a)
+	defer log.Printf("%T - GetRefreshTokenHdl executed\n", a)
+
+	accessToken, refreshToken, idToken, errMsg := a.authUsecase.GetRefreshTokenSvc(ctx)
+
+	if errMsg.Error != nil {
+		switch errMsg.Type {
+		case "INTERNAL_CONNECTION_PROBLEM":
+			ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+				"code": 99,
+				"type": "INTERNAL_SERVER_ERROR",
+				"invalid_arg": gin.H{
+					"error_type":    errMsg.Type,
+					"error_message": errMsg.Error.Error(),
+				},
+			})
+		case "USER_NOT_FOUND":
+			ctx.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
+				"code": 97,
+				"type": "UNAUTHENTICATED",
+				"invalid_arg": gin.H{
+					"error_type":    errMsg.Type,
+					"error_message": errMsg.Error.Error(),
+				},
+			})
+		}
+		return
+	}
+
+	ctx.JSON(http.StatusCreated, gin.H{
+		"code":    01,
+		"message": "token refreshed successfully",
+		"type":    "ACCEPTED",
+		"data": gin.H{
+			"access_token":  accessToken,
+			"refresh_token": refreshToken,
+			"id_token":      idToken,
+		},
+	})
+
+}
+
 func NewAuthHandler(authUsecase auth.AuthUsecase) auth.AuthHandler {
 	return &AuthHdlImpl{authUsecase: authUsecase}
 }

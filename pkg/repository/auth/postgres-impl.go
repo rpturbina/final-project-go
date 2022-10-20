@@ -19,10 +19,25 @@ func (a *AuthRepoImpl) LoginUser(ctx context.Context, username string) (result u
 
 	db := a.pgCln.GetClient()
 
-	err = db.Debug().Model(&user.User{}).Select("username", "password", "email", "dob").Where("username = ?", username).Find(&result).Error
+	err = db.Model(&user.User{}).Select("id", "username", "password", "email", "dob").Where("username = ?", username).Find(&result).Error
 
 	if err != nil {
 		log.Printf("error when getting username %v\n", username)
+	}
+
+	return result, err
+}
+
+func (a *AuthRepoImpl) CheckUserById(ctx context.Context, userId uint64) (result user.User, err error) {
+	log.Printf("%T - CheckUserById is invoked\n", a)
+	defer log.Printf("%T - CheckUserById executed\n", a)
+
+	db := a.pgCln.GetClient()
+
+	err = db.Model(&user.User{}).Select("id", "username", "password", "email", "dob").Where("id = ?", userId).Find(&result).Error
+
+	if err != nil {
+		log.Printf("error when getting user_id %v\n", userId)
 	}
 
 	return result, err
