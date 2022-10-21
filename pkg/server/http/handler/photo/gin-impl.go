@@ -8,7 +8,6 @@ import (
 	"strconv"
 
 	"github.com/gin-gonic/gin"
-	"github.com/rpturbina/final-project-go/pkg/domain/comment"
 	"github.com/rpturbina/final-project-go/pkg/domain/message"
 	"github.com/rpturbina/final-project-go/pkg/domain/photo"
 )
@@ -43,10 +42,6 @@ func (p *PhotoHdlImpl) CreatePhotoHdl(ctx *gin.Context) {
 	if errMsg.Error != nil {
 		message.ErrorResponseSwitcher(ctx, errMsg)
 		return
-	}
-
-	if result.Comments == nil {
-		result.Comments = []comment.Comment{}
 	}
 
 	ctx.JSON(http.StatusCreated, gin.H{
