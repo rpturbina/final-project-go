@@ -67,9 +67,16 @@ func (p *PhotoHdlImpl) GetPhotosByUserIdHdl(ctx *gin.Context) {
 	log.Printf("%T - GetPhotosByUserIdHdl is invoked\n", p)
 	defer log.Printf("%T - GetPhotosByUserIdHdl executed\n", p)
 
-	stringUserId := ctx.Query("user_id")
+	a, b := ctx.GetQueryArray("user_id")
+	_, _ = a, b
 
-	if stringUserId == "" {
+	stringUserId, isExist := ctx.GetQuery("user_id")
+
+	if !isExist {
+		stringUserId = ctx.Value("user").(string)
+	}
+
+	if isExist && stringUserId == "" {
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
 			"code":    96,
 			"type":    "BAD_REQUEST",

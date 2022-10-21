@@ -35,10 +35,6 @@ func (p *PhotoRepoImpl) GetPhotosByUserId(ctx context.Context, userId uint64) (r
 
 	db := p.pgCln.GetClient()
 
-	// err = db.Preload("Users", func(db *gorm.DB) *gorm.DB {
-	// 	return db.Select("users.photos")
-	// }).Find(&result).Error
-	// err = db.Table("photos").Where("user_id = ?", userId).Select("id", "created_at", "updated_at", "title", "caption", "url", "user_id").Order("id").Find(&result).Error
 	err = db.Table("photos").Where("user_id = ?", userId).Select("id", "created_at", "updated_at", "title", "caption", "url", "user_id").Order("id").Preload("Comments").Find(&result).Error
 
 	if err != nil {
