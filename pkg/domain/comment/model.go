@@ -6,8 +6,7 @@ import (
 
 type Comment struct {
 	gormmodel.GormModel
-	// TODO: give field tags
 	UserID  uint64 `json:"user_id"`
-	PhotoID uint64 `json:"photo_id"`
-	Message string `gorm:"not null" json:"message" valid:"required~Comment message is required"`
+	PhotoID uint64 `json:"photo_id" valid:"required~photo id is required"`
+	Message string `gorm:"not null" json:"message" valid:"required~comment message is required"`
 }
