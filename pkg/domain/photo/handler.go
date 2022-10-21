@@ -6,4 +6,5 @@ type PhotoHandler interface {
 	CreatePhotoHdl(ctx *gin.Context)
 	GetPhotosHdl(ctx *gin.Context)
 	UpdatePhotoHdl(ctx *gin.Context)
+	DeletePhotoHdl(ctx *gin.Context)
 }

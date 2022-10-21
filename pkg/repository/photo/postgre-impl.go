@@ -77,6 +77,21 @@ func (p *PhotoRepoImpl) UpdatePhoto(ctx context.Context, title string, caption s
 	return result, err
 }
 
+func (p *PhotoRepoImpl) DeletePhoto(ctx context.Context, photoId uint64) (err error) {
+	log.Printf("%T - DeletePhoto is invoked\n", p)
+	defer log.Printf("%T - DeletePhoto executed\n", p)
+
+	db := p.pgCln.GetClient()
+
+	err = db.Where("id = ?", photoId).Delete(&photo.Photo{}).Error
+
+	if err != nil {
+		log.Printf("error when deleting photo by id %v \n", photoId)
+	}
+
+	return err
+}
+
 func NewPhotoRepo(pgCln postgres.PostgresClient) photo.PhotoRepo {
 	return &PhotoRepoImpl{pgCln: pgCln}
 }

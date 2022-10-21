@@ -168,6 +168,25 @@ func (p *PhotoUsecaseImpl) UpdatePhotoSvc(ctx context.Context, title string, cap
 	return result, errMsg
 }
 
+func (p *PhotoUsecaseImpl) DeletePhotoSvc(ctx context.Context, photoId uint64) (errMsg message.ErrorMessage) {
+	log.Printf("%T - DeletePhotoSvc is invoked\n", p)
+	defer log.Printf("%T - DeletePhotoSvc executed\n", p)
+
+	log.Println("calling delete photo repo")
+	err := p.photoRepo.DeletePhoto(ctx, photoId)
+
+	if err != nil {
+		log.Printf("error when fetching data from database: %s\n", err.Error())
+		errMsg = message.ErrorMessage{
+			Error: err,
+			Type:  "INTERNAL_CONNECTION_PROBLEM",
+		}
+		return errMsg
+	}
+
+	return errMsg
+}
+
 func NewPhotoUsecase(photoRepo photo.PhotoRepo, userUsecase user.UserUsecase) photo.PhotoUsecase {
 	return &PhotoUsecaseImpl{photoRepo: photoRepo, userUsecase: userUsecase}
 }

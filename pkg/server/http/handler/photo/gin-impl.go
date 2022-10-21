@@ -165,10 +165,8 @@ func (p *PhotoHdlImpl) UpdatePhotoHdl(ctx *gin.Context) {
 	result, errMsg := p.photoUsecase.GetPhotoByIdSvc(ctx, photoId)
 
 	if errMsg.Error != nil {
-		if errMsg.Error != nil {
-			message.ErrorResponseSwitcher(ctx, errMsg)
-			return
-		}
+		message.ErrorResponseSwitcher(ctx, errMsg)
+		return
 	}
 
 	stringUserId := ctx.Value("user").(string)
@@ -180,6 +178,7 @@ func (p *PhotoHdlImpl) UpdatePhotoHdl(ctx *gin.Context) {
 			Type:  "INVALID_SCOPE",
 			Error: errors.New("cannot update the photo"),
 		})
+		return
 	}
 
 	var updatedPhoto photo.Photo
@@ -208,22 +207,63 @@ func (p *PhotoHdlImpl) UpdatePhotoHdl(ctx *gin.Context) {
 		"type":    "ACCEPTED",
 		"data":    result,
 	})
+}
 
-	// idToken, errMsg := p.userUsecase.UpdateUserSvc(ctx, userId, updatedUser.Email, updatedUser.Username)
+func (p *PhotoHdlImpl) DeletePhotoHdl(ctx *gin.Context) {
+	log.Printf("%T - DeletePhotoHdl is invoked\n", p)
+	defer log.Printf("%T - DeletePhotoHdl executed\n", p)
 
-	// if errMsg.Error != nil {
-	// 	message.ErrorResponseSwitcher(ctx, errMsg)
-	// 	return
-	// }
+	log.Println("check photoId from path parameter")
+	photoIdParam := ctx.Param("photoId")
 
-	// ctx.JSON(http.StatusOK, gin.H{
-	// 	"code":    01,
-	// 	"message": "user has been successfully updated",
-	// 	"type":    "ACCEPTED",
-	// 	"data": gin.H{
-	// 		"id_token": idToken,
-	// 	},
-	// })
+	photoId, err := strconv.ParseUint(photoIdParam, 0, 64)
+
+	if err != nil {
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+			"code":    96,
+			"type":    "BAD_REQUEST",
+			"message": "invalid params",
+			"invalid_arg": gin.H{
+				"error_type":    "INVALID_PARAMS",
+				"error_message": "invalid params",
+			},
+		})
+		return
+	}
+
+	log.Println("calling get photo by id usecase service")
+	result, errMsg := p.photoUsecase.GetPhotoByIdSvc(ctx, photoId)
+
+	if errMsg.Error != nil {
+		message.ErrorResponseSwitcher(ctx, errMsg)
+		return
+	}
+
+	stringUserId := ctx.Value("user").(string)
+	userId, _ := strconv.ParseUint(stringUserId, 0, 64)
+
+	log.Println("verify the photo belongs to")
+	if result.UserID != userId {
+		message.ErrorResponseSwitcher(ctx, message.ErrorMessage{
+			Type:  "INVALID_SCOPE",
+			Error: errors.New("cannot delete the photo"),
+		})
+		return
+	}
+
+	log.Println("calling delete photo usecase service")
+	errMsg = p.photoUsecase.DeletePhotoSvc(ctx, photoId)
+
+	if errMsg.Error != nil {
+		message.ErrorResponseSwitcher(ctx, errMsg)
+		return
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{
+		"code":    01,
+		"message": "photo has been successfully deleted",
+		"type":    "ACCEPTED",
+	})
 }
 
 func NewPhotoHandler(photoUsecase photo.PhotoUsecase) photo.PhotoHandler {
