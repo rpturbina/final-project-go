@@ -2,6 +2,7 @@ package photo
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"strconv"
 
@@ -82,6 +83,36 @@ func (p *PhotoUsecaseImpl) GetPhotosByUserIdSvc(ctx context.Context, userId uint
 
 	log.Println("calling get photo by userid repo")
 	result, err := p.photoRepo.GetPhotosByUserId(ctx, userId)
+
+	if err != nil {
+		log.Printf("error when fetching data from database: %s\n", err.Error())
+		errMsg = message.ErrorMessage{
+			Error: err,
+			Type:  "INTERNAL_CONNECTION_PROBLEM",
+		}
+		return result, errMsg
+	}
+
+	return result, errMsg
+}
+
+func (p *PhotoUsecaseImpl) GetPhotoByIdSvc(ctx context.Context, photoId uint64) (result photo.Photo, errMsg message.ErrorMessage) {
+	log.Printf("%T - GetPhotoByIdSvc is invoked\n", p)
+	defer log.Printf("%T - GetPhotoByIdSvc executed\n", p)
+
+	log.Println("calling get photo by id repo")
+	result, err := p.photoRepo.GetPhotoById(ctx, photoId)
+
+	if result.ID <= 0 {
+		log.Printf("photo with id %v not found", photoId)
+
+		err = fmt.Errorf("photo with id %v not found", photoId)
+		errMsg = message.ErrorMessage{
+			Error: err,
+			Type:  "PHOTO_NOT_FOUND",
+		}
+		return result, errMsg
+	}
 
 	if err != nil {
 		log.Printf("error when fetching data from database: %s\n", err.Error())

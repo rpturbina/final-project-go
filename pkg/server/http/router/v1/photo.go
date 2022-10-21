@@ -16,7 +16,7 @@ type PhotoRouterImpl struct {
 }
 
 func (p *PhotoRouterImpl) get() {
-	p.routerGroup.GET("", p.authMiddleware.CheckJWTAuth, p.photoHandler.GetPhotosByUserIdHdl)
+	p.routerGroup.GET("", p.authMiddleware.CheckJWTAuth, p.photoHandler.GetPhotosHdl)
 }
 
 func (p *PhotoRouterImpl) post() {

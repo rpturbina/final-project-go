@@ -4,5 +4,5 @@ import "github.com/gin-gonic/gin"
 
 type PhotoHandler interface {
 	CreatePhotoHdl(ctx *gin.Context)
-	GetPhotosByUserIdHdl(ctx *gin.Context)
+	GetPhotosHdl(ctx *gin.Context)
 }

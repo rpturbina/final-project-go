@@ -63,20 +63,32 @@ func (p *PhotoHdlImpl) CreatePhotoHdl(ctx *gin.Context) {
 	})
 }
 
-func (p *PhotoHdlImpl) GetPhotosByUserIdHdl(ctx *gin.Context) {
+func (p *PhotoHdlImpl) GetPhotosHdl(ctx *gin.Context) {
 	log.Printf("%T - GetPhotosByUserIdHdl is invoked\n", p)
 	defer log.Printf("%T - GetPhotosByUserIdHdl executed\n", p)
 
-	a, b := ctx.GetQueryArray("user_id")
-	_, _ = a, b
+	stringPhotoId, isPhotoIdExist := ctx.GetQuery("id")
 
-	stringUserId, isExist := ctx.GetQuery("user_id")
+	if isPhotoIdExist {
+		photoId, _ := strconv.ParseUint(stringPhotoId, 0, 64)
+		log.Println("calling get photos by id usecase service")
+		result, errMsg := p.photoUsecase.GetPhotoByIdSvc(ctx, photoId)
 
-	if !isExist {
-		stringUserId = ctx.Value("user").(string)
+		if errMsg.Error != nil {
+			message.ErrorResponseSwitcher(ctx, errMsg)
+			return
+		}
+
+		ctx.JSON(http.StatusCreated, gin.H{
+			"code":    00,
+			"message": fmt.Sprintf("photos id %v is found", photoId),
+			"type":    "SUCCESS",
+			"data":    result,
+		})
+		return
 	}
 
-	if isExist && stringUserId == "" {
+	if isPhotoIdExist && stringPhotoId == "" {
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
 			"code":    96,
 			"type":    "BAD_REQUEST",
@@ -89,9 +101,28 @@ func (p *PhotoHdlImpl) GetPhotosByUserIdHdl(ctx *gin.Context) {
 		return
 	}
 
+	stringUserId, isUserIdExist := ctx.GetQuery("user_id")
+
+	if isUserIdExist && stringUserId == "" {
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+			"code":    96,
+			"type":    "BAD_REQUEST",
+			"message": "invalid params",
+			"invalid_arg": gin.H{
+				"error_type":    "INVALID_PARAMS",
+				"error_message": "invalid params",
+			},
+		})
+		return
+	}
+
+	if !isUserIdExist {
+		stringUserId = ctx.Value("user").(string)
+	}
+
 	userId, _ := strconv.ParseUint(stringUserId, 0, 64)
 
-	log.Println("calling create photo usecase service")
+	log.Println("calling get photos by user id usecase service")
 	result, errMsg := p.photoUsecase.GetPhotosByUserIdSvc(ctx, userId)
 
 	if errMsg.Error != nil {

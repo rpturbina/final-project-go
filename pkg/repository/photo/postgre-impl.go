@@ -44,6 +44,21 @@ func (p *PhotoRepoImpl) GetPhotosByUserId(ctx context.Context, userId uint64) (r
 	return result, err
 }
 
+func (p *PhotoRepoImpl) GetPhotoById(ctx context.Context, photoId uint64) (result photo.Photo, err error) {
+	log.Printf("%T - GetPhotoById is invoked\n", p)
+	defer log.Printf("%T - GetPhotoById executed\n", p)
+
+	db := p.pgCln.GetClient()
+
+	err = db.Table("photos").Where("id = ?", photoId).Select("id", "title", "caption", "url", "user_id").Preload("Comments").Find(&result).Error
+
+	if err != nil {
+		log.Printf("error when getting photo by id %v\n", photoId)
+	}
+
+	return result, err
+}
+
 func NewPhotoRepo(pgCln postgres.PostgresClient) photo.PhotoRepo {
 	return &PhotoRepoImpl{pgCln: pgCln}
 }
