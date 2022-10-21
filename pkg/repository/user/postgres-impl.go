@@ -43,9 +43,9 @@ func (u *UserRepoImpl) GetUserById(ctx context.Context, userId uint64) (result u
 	return result, err
 }
 
-func (u *UserRepoImpl) UpdateUserById(ctx context.Context, userId uint64, email string, username string) (result user.User, err error) {
-	log.Printf("%T - UpdateUserById is invoked\n", u)
-	defer log.Printf("%T - UpdateUserById executed\n", u)
+func (u *UserRepoImpl) UpdateUser(ctx context.Context, userId uint64, email string, username string) (result user.User, err error) {
+	log.Printf("%T - UpdateUser is invoked\n", u)
+	defer log.Printf("%T - UpdateUser executed\n", u)
 
 	db := u.pgCln.GetClient()
 

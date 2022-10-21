@@ -24,7 +24,7 @@ func (u *UserRouterImpl) get() {
 }
 
 func (u *UserRouterImpl) put() {
-	u.routerGroup.PUT("", u.authMiddleware.CheckJWTAuth, u.userHandler.UpdateUserByIdHdl)
+	u.routerGroup.PUT("", u.authMiddleware.CheckJWTAuth, u.userHandler.UpdateUserHdl)
 }
 
 func (u *UserRouterImpl) delete() {

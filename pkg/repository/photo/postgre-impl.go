@@ -6,6 +6,7 @@ import (
 
 	"github.com/rpturbina/final-project-go/config/postgres"
 	"github.com/rpturbina/final-project-go/pkg/domain/photo"
+	"gorm.io/gorm/clause"
 )
 
 type PhotoRepoImpl struct {
@@ -54,6 +55,23 @@ func (p *PhotoRepoImpl) GetPhotoById(ctx context.Context, photoId uint64) (resul
 
 	if err != nil {
 		log.Printf("error when getting photo by id %v\n", photoId)
+	}
+
+	return result, err
+}
+
+func (p *PhotoRepoImpl) UpdatePhoto(ctx context.Context, title string, caption string, url string) (result photo.Photo, err error) {
+	log.Printf("%T - UpdatePhoto is invoked\n", p)
+	defer log.Printf("%T - UpdatePhoto executed\n", p)
+
+	photoId := ctx.Value("photoId").(uint64)
+
+	db := p.pgCln.GetClient()
+
+	err = db.Model(&result).Clauses(clause.Returning{Columns: []clause.Column{{Name: "id"}, {Name: "title"}, {Name: "caption"}, {Name: "url"}, {Name: "user_id"}, {Name: "updated_at"}}}).Where("id = ?", photoId).Updates(photo.Photo{Title: title, Caption: caption, Url: url}).Error
+
+	if err != nil {
+		log.Printf("error when updating photo by id %v\n", photoId)
 	}
 
 	return result, err

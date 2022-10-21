@@ -1,6 +1,7 @@
 package v1
 
 import (
+	"errors"
 	"fmt"
 	"log"
 	"net/http"
@@ -136,6 +137,93 @@ func (p *PhotoHdlImpl) GetPhotosHdl(ctx *gin.Context) {
 		"type":    "SUCCESS",
 		"data":    result,
 	})
+}
+
+func (p *PhotoHdlImpl) UpdatePhotoHdl(ctx *gin.Context) {
+	log.Printf("%T - UpdatePhotoHdl is invoked\n", p)
+	defer log.Printf("%T - UpdatePhotoHdl executed\n", p)
+
+	log.Println("check photoId from path parameter")
+	photoIdParam := ctx.Param("photoId")
+
+	photoId, err := strconv.ParseUint(photoIdParam, 0, 64)
+
+	if err != nil {
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+			"code":    96,
+			"type":    "BAD_REQUEST",
+			"message": "invalid params",
+			"invalid_arg": gin.H{
+				"error_type":    "INVALID_PARAMS",
+				"error_message": "invalid params",
+			},
+		})
+		return
+	}
+
+	log.Println("calling get photo by id usecase service")
+	result, errMsg := p.photoUsecase.GetPhotoByIdSvc(ctx, photoId)
+
+	if errMsg.Error != nil {
+		if errMsg.Error != nil {
+			message.ErrorResponseSwitcher(ctx, errMsg)
+			return
+		}
+	}
+
+	stringUserId := ctx.Value("user").(string)
+	userId, _ := strconv.ParseUint(stringUserId, 0, 64)
+
+	log.Println("verify the photo belongs to")
+	if result.UserID != userId {
+		message.ErrorResponseSwitcher(ctx, message.ErrorMessage{
+			Type:  "INVALID_SCOPE",
+			Error: errors.New("cannot update the photo"),
+		})
+	}
+
+	var updatedPhoto photo.Photo
+
+	log.Println("binding body payload from request")
+	if err := ctx.ShouldBindJSON(&updatedPhoto); err != nil {
+		message.ErrorResponseSwitcher(ctx, message.ErrorMessage{
+			Type:  "INVALID_PAYLOAD",
+			Error: errors.New("failed to bind payload"),
+		})
+		return
+	}
+
+	ctx.Set("photoId", result.ID)
+
+	result, errMsg = p.photoUsecase.UpdatePhotoSvc(ctx, updatedPhoto.Title, updatedPhoto.Caption, updatedPhoto.Url)
+
+	if errMsg.Error != nil {
+		message.ErrorResponseSwitcher(ctx, errMsg)
+		return
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{
+		"code":    01,
+		"message": "photo has been successfully updated",
+		"type":    "ACCEPTED",
+		"data":    result,
+	})
+
+	// idToken, errMsg := p.userUsecase.UpdateUserSvc(ctx, userId, updatedUser.Email, updatedUser.Username)
+
+	// if errMsg.Error != nil {
+	// 	message.ErrorResponseSwitcher(ctx, errMsg)
+	// 	return
+	// }
+
+	// ctx.JSON(http.StatusOK, gin.H{
+	// 	"code":    01,
+	// 	"message": "user has been successfully updated",
+	// 	"type":    "ACCEPTED",
+	// 	"data": gin.H{
+	// 		"id_token": idToken,
+	// 	},
+	// })
 }
 
 func NewPhotoHandler(photoUsecase photo.PhotoUsecase) photo.PhotoHandler {

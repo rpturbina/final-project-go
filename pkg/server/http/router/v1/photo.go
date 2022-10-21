@@ -23,9 +23,14 @@ func (p *PhotoRouterImpl) post() {
 	p.routerGroup.POST("", p.authMiddleware.CheckJWTAuth, p.photoHandler.CreatePhotoHdl)
 }
 
+func (p *PhotoRouterImpl) put() {
+	p.routerGroup.PUT("/:photoId", p.authMiddleware.CheckJWTAuth, p.photoHandler.UpdatePhotoHdl)
+}
+
 func (p *PhotoRouterImpl) Routers() {
 	p.get()
 	p.post()
+	p.put()
 }
 
 func NewPhotoRouter(ginEngine engine.HttpServer, photoHandler photo.PhotoHandler, authMiddleware middleware.AuthMiddleware) router.Router {

@@ -108,9 +108,9 @@ func (u *UserHdlImpl) GetUserByIdHdl(ctx *gin.Context) {
 	})
 }
 
-func (u *UserHdlImpl) UpdateUserByIdHdl(ctx *gin.Context) {
-	log.Printf("%T - UpdateUserByIdHdl is invoked\n", u)
-	defer log.Printf("%T - UpdateUserByIdHdl executed\n", u)
+func (u *UserHdlImpl) UpdateUserHdl(ctx *gin.Context) {
+	log.Printf("%T - UpdateUserHdl is invoked\n", u)
+	defer log.Printf("%T - UpdateUserHdl executed\n", u)
 
 	stringUserId := ctx.Value("user").(string)
 
@@ -130,7 +130,7 @@ func (u *UserHdlImpl) UpdateUserByIdHdl(ctx *gin.Context) {
 		return
 	}
 
-	idToken, errMsg := u.userUsecase.UpdateUserByIdSvc(ctx, userId, updatedUser.Email, updatedUser.Username)
+	idToken, errMsg := u.userUsecase.UpdateUserSvc(ctx, userId, updatedUser.Email, updatedUser.Username)
 
 	if errMsg.Error != nil {
 		message.ErrorResponseSwitcher(ctx, errMsg)

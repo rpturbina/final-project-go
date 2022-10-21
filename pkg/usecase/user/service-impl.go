@@ -133,9 +133,9 @@ func (u *UserUsecaseImpl) GetUserByIdSvc(ctx context.Context, userId uint64) (re
 	return result, errMsg
 }
 
-func (u *UserUsecaseImpl) UpdateUserByIdSvc(ctx context.Context, userId uint64, email string, username string) (idToken string, errMsg message.ErrorMessage) {
-	log.Printf("%T - UpdateUserByIdSvc is invoked\n", u)
-	defer log.Printf("%T - UpdateUserByIdSvc executed\n", u)
+func (u *UserUsecaseImpl) UpdateUserSvc(ctx context.Context, userId uint64, email string, username string) (idToken string, errMsg message.ErrorMessage) {
+	log.Printf("%T - UpdateUserSvc is invoked\n", u)
+	defer log.Printf("%T - UpdateUserSvc executed\n", u)
 
 	if email == "" {
 		errMsg := message.ErrorMessage{
@@ -163,7 +163,7 @@ func (u *UserUsecaseImpl) UpdateUserByIdSvc(ctx context.Context, userId uint64, 
 		return idToken, errMsg
 	}
 
-	result, err := u.userRepo.UpdateUserById(ctx, userId, email, username)
+	result, err := u.userRepo.UpdateUser(ctx, userId, email, username)
 
 	if err != nil {
 		log.Printf("error when fetching data from database: %s\n", err.Error())
@@ -186,8 +186,8 @@ func (u *UserUsecaseImpl) UpdateUserByIdSvc(ctx context.Context, userId uint64, 
 }
 
 func (u *UserUsecaseImpl) DeleteUserSvc(ctx context.Context, userId uint64) (errMsg message.ErrorMessage) {
-	log.Printf("%T - UpdateUserByIdSvc is invoked\n", u)
-	defer log.Printf("%T - UpdateUserByIdSvc executed\n", u)
+	log.Printf("%T - UpdateUserSvc is invoked\n", u)
+	defer log.Printf("%T - UpdateUserSvc executed\n", u)
 
 	log.Println("calling delete user repo")
 	err := u.userRepo.DeleteUser(ctx, userId)

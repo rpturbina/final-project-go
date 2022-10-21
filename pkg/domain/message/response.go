@@ -44,6 +44,18 @@ func ErrorResponseSwitcher(ctx *gin.Context, errMsg ErrorMessage) {
 			},
 		}
 
+	case "INVALID_SCOPE":
+		httpStatusCode = http.StatusForbidden
+		response = Response{
+			Code:    98,
+			Message: errMsg.Error.Error(),
+			Type:    "FORBIDDEN",
+			InvalidArg: gin.H{
+				"error_message": errMsg.Error.Error(),
+				"error_type":    errMsg.Type,
+			},
+		}
+
 	case "INTERNAL_CONNECTION_PROBLEM":
 		httpStatusCode = http.StatusInternalServerError
 		response = Response{
@@ -55,6 +67,7 @@ func ErrorResponseSwitcher(ctx *gin.Context, errMsg ErrorMessage) {
 				"error_type":    errMsg.Type,
 			},
 		}
+
 	}
 
 	ctx.AbortWithStatusJSON(httpStatusCode, response)

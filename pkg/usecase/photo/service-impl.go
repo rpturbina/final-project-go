@@ -2,6 +2,7 @@ package photo
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"log"
 	"strconv"
@@ -113,6 +114,47 @@ func (p *PhotoUsecaseImpl) GetPhotoByIdSvc(ctx context.Context, photoId uint64) 
 		}
 		return result, errMsg
 	}
+
+	if err != nil {
+		log.Printf("error when fetching data from database: %s\n", err.Error())
+		errMsg = message.ErrorMessage{
+			Error: err,
+			Type:  "INTERNAL_CONNECTION_PROBLEM",
+		}
+		return result, errMsg
+	}
+
+	return result, errMsg
+}
+
+func (p *PhotoUsecaseImpl) UpdatePhotoSvc(ctx context.Context, title string, caption string, url string) (result photo.Photo, errMsg message.ErrorMessage) {
+	log.Printf("%T - UpdatePhotoSvc is invoked\n", p)
+	defer log.Printf("%T - UpdatePhotoSvc executed\n", p)
+
+	if title == "" {
+		errMsg := message.ErrorMessage{
+			Error: errors.New("photo title is required"),
+			Type:  "PHOTO_TITLE_IS_EMPTY",
+		}
+		return result, errMsg
+	}
+	if url == "" {
+		errMsg := message.ErrorMessage{
+			Error: errors.New("photo url is required"),
+			Type:  "PHOTO_URL_IS_EMPTY",
+		}
+		return result, errMsg
+	}
+
+	if !govalidator.IsURL(url) {
+		errMsg := message.ErrorMessage{
+			Error: errors.New("invalid url format"),
+			Type:  "INVALID_PHOTO_URL_FORMAT",
+		}
+		return result, errMsg
+	}
+
+	result, err := p.photoRepo.UpdatePhoto(ctx, title, caption, url)
 
 	if err != nil {
 		log.Printf("error when fetching data from database: %s\n", err.Error())
