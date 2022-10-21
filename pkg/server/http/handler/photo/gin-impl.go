@@ -1,8 +1,10 @@
 package v1
 
 import (
+	"fmt"
 	"log"
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"github.com/rpturbina/final-project-go/pkg/domain/comment"
@@ -48,7 +50,7 @@ func (p *PhotoHdlImpl) CreatePhotoHdl(ctx *gin.Context) {
 
 	ctx.JSON(http.StatusCreated, gin.H{
 		"code":    01,
-		"message": "user has successfully registered",
+		"message": "photo has successfully created",
 		"type":    "ACCEPTED",
 		"data": gin.H{
 			"id":         result.ID,
@@ -58,6 +60,43 @@ func (p *PhotoHdlImpl) CreatePhotoHdl(ctx *gin.Context) {
 			"created_at": result.CreatedAt,
 			"user_id":    result.UserID,
 		},
+	})
+}
+
+func (p *PhotoHdlImpl) GetPhotosByUserIdHdl(ctx *gin.Context) {
+	log.Printf("%T - GetPhotosByUserIdHdl is invoked\n", p)
+	defer log.Printf("%T - GetPhotosByUserIdHdl executed\n", p)
+
+	stringUserId := ctx.Query("user_id")
+
+	if stringUserId == "" {
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+			"code":    96,
+			"type":    "BAD_REQUEST",
+			"message": "invalid params",
+			"invalid_arg": gin.H{
+				"error_type":    "INVALID_PARAMS",
+				"error_message": "invalid params",
+			},
+		})
+		return
+	}
+
+	userId, _ := strconv.ParseUint(stringUserId, 0, 64)
+
+	log.Println("calling create photo usecase service")
+	result, errMsg := p.photoUsecase.GetPhotosByUserIdSvc(ctx, userId)
+
+	if errMsg.Error != nil {
+		message.ErrorResponseSwitcher(ctx, errMsg)
+		return
+	}
+
+	ctx.JSON(http.StatusCreated, gin.H{
+		"code":    00,
+		"message": fmt.Sprintf("photos by user id %v is found", userId),
+		"type":    "SUCCESS",
+		"data":    result,
 	})
 }
 

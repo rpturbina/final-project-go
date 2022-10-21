@@ -9,7 +9,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/rpturbina/final-project-go/helpers"
 	"github.com/rpturbina/final-project-go/pkg/domain/message"
-	"github.com/rpturbina/final-project-go/pkg/domain/socialmedia"
 	"github.com/rpturbina/final-project-go/pkg/domain/user"
 )
 
@@ -97,10 +96,6 @@ func (u *UserHdlImpl) GetUserByIdHdl(ctx *gin.Context) {
 		return
 	}
 
-	if result.SocialMedias == nil {
-		result.SocialMedias = []socialmedia.SocialMedia{}
-	}
-
 	ctx.JSON(http.StatusOK, gin.H{
 		"code":    00,
 		"message": "user is found",
@@ -169,7 +164,7 @@ func (u *UserHdlImpl) DeleteUserHdl(ctx *gin.Context) {
 
 	ctx.JSON(http.StatusOK, gin.H{
 		"code":    01,
-		"message": "user has been successfully deleted",
+		"message": "Your account has been successfully deleted",
 		"type":    "ACCEPTED",
 	})
 }

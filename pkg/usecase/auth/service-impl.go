@@ -18,8 +18,8 @@ import (
 )
 
 type AuthUsecaseImpl struct {
-	authRepo auth.AuthRepo
-	userRepo user.UserRepo
+	authRepo    auth.AuthRepo
+	userUsecase user.UserUsecase
 }
 
 func (a *AuthUsecaseImpl) LoginUserSvc(ctx context.Context, username string, password string) (accessToken string, refreshToken string, idToken string, errMsg message.ErrorMessage) {
@@ -107,10 +107,10 @@ func (a *AuthUsecaseImpl) GetRefreshTokenSvc(ctx context.Context) (accessToken s
 
 	userId, _ := strconv.ParseUint(stringUserId, 0, 64)
 
-	result, err := a.userRepo.GetUserById(ctx, userId)
+	log.Println("calling get user by id usecase")
+	result, errMsg := a.userUsecase.GetUserByIdSvc(ctx, userId)
 
-	if err != nil {
-		log.Printf("error when fetching data from database: %s\n", err.Error())
+	if errMsg.Error != nil {
 		return accessToken, refreshToken, idToken, errMsg
 	}
 
@@ -153,6 +153,6 @@ func (a *AuthUsecaseImpl) GetRefreshTokenSvc(ctx context.Context) (accessToken s
 	return accessToken, refreshToken, idToken, errMsg
 }
 
-func NewAuthUsecase(authRepo auth.AuthRepo, userRepo user.UserRepo) auth.AuthUsecase {
-	return &AuthUsecaseImpl{authRepo: authRepo, userRepo: userRepo}
+func NewAuthUsecase(authRepo auth.AuthRepo, userUsecase user.UserUsecase) auth.AuthUsecase {
+	return &AuthUsecaseImpl{authRepo: authRepo, userUsecase: userUsecase}
 }

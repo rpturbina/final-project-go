@@ -51,11 +51,11 @@ func main() {
 	userHandler := userhandler.NewUserHandler(userUsecase)
 
 	authRepo := authrepo.NewAuthRepo(postgresCln)
-	authUsecase := authusecase.NewAuthUsecase(authRepo, userRepo)
+	authUsecase := authusecase.NewAuthUsecase(authRepo, userUsecase)
 	authHandler := authhandler.NewAuthHandler(authUsecase)
 
 	photoRepo := photorepo.NewPhotoRepo(postgresCln)
-	photoUsecase := photousecase.NewPhotoUsecase(photoRepo)
+	photoUsecase := photousecase.NewPhotoUsecase(photoRepo, userUsecase)
 	photoHandler := photohandler.NewPhotoHandler(photoUsecase)
 
 	authMiddleware := middleware.NewAuthMiddleware(userUsecase)

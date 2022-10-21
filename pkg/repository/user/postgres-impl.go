@@ -34,7 +34,7 @@ func (u *UserRepoImpl) GetUserById(ctx context.Context, userId uint64) (result u
 
 	db := u.pgCln.GetClient()
 
-	err = db.Model(&user.User{}).Where("id = ?", userId).Find(&result).Error
+	err = db.Model(&user.User{}).Where("id = ?", userId).Preload("SocialMedias").Find(&result).Error
 
 	if err != nil {
 		log.Printf("error when getting user by id %v\n", userId)
