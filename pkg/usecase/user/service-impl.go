@@ -32,38 +32,38 @@ func (u *UserUsecaseImpl) RegisterUserSvc(ctx context.Context, user user.User) (
 				Error: err,
 				Type:  "USERNAME_IS_EMPTY",
 			}
-			return user, errMsg
+			return result, errMsg
 		case "email is required":
 			errMsg := message.ErrorMessage{
 				Error: err,
 				Type:  "EMAIL_IS_EMPTY",
 			}
-			return user, errMsg
+			return result, errMsg
 		case "invalid email format":
 			errMsg := message.ErrorMessage{
 				Error: err,
 				Type:  "WRONG_EMAIL_FORMAT",
 			}
-			return user, errMsg
+			return result, errMsg
 		case "password is required":
 			errMsg := message.ErrorMessage{
 				Error: err,
 				Type:  "PASSWORD_IS_EMPTY",
 			}
-			return user, errMsg
+			return result, errMsg
 		case "password has to have a minimum length of 6 characters":
 			errMsg := message.ErrorMessage{
 				Error: err,
 				Type:  "INVALID_PASSWORD_FORMAT",
 			}
-			return user, errMsg
+			return result, errMsg
 
 		default:
 			errMsg := message.ErrorMessage{
 				Error: err,
 				Type:  "INVALID_PAYLOAD",
 			}
-			return user, errMsg
+			return result, errMsg
 		}
 	}
 
@@ -76,7 +76,7 @@ func (u *UserUsecaseImpl) RegisterUserSvc(ctx context.Context, user user.User) (
 				Error: err,
 				Type:  "USERNAME_REGISTERED",
 			}
-			return user, errMsg
+			return result, errMsg
 		}
 
 		if strings.Contains(err.Error(), `duplicate key value violates unique constraint "idx_users_email"`) {
@@ -86,7 +86,7 @@ func (u *UserUsecaseImpl) RegisterUserSvc(ctx context.Context, user user.User) (
 				Type:  "EMAIL_REGISTERED",
 			}
 
-			return user, errMsg
+			return result, errMsg
 		}
 
 	}

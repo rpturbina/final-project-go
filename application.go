@@ -8,12 +8,15 @@ import (
 	engine "github.com/rpturbina/final-project-go/config/gin"
 	"github.com/rpturbina/final-project-go/config/postgres"
 	authrepo "github.com/rpturbina/final-project-go/pkg/repository/auth"
+	photorepo "github.com/rpturbina/final-project-go/pkg/repository/photo"
 	userrepo "github.com/rpturbina/final-project-go/pkg/repository/user"
 	authhandler "github.com/rpturbina/final-project-go/pkg/server/http/handler/auth"
+	photohandler "github.com/rpturbina/final-project-go/pkg/server/http/handler/photo"
 	userhandler "github.com/rpturbina/final-project-go/pkg/server/http/handler/user"
 	"github.com/rpturbina/final-project-go/pkg/server/http/middleware"
 	router "github.com/rpturbina/final-project-go/pkg/server/http/router/v1"
 	authusecase "github.com/rpturbina/final-project-go/pkg/usecase/auth"
+	photousecase "github.com/rpturbina/final-project-go/pkg/usecase/photo"
 	userusecase "github.com/rpturbina/final-project-go/pkg/usecase/user"
 )
 
@@ -51,10 +54,15 @@ func main() {
 	authUsecase := authusecase.NewAuthUsecase(authRepo, userRepo)
 	authHandler := authhandler.NewAuthHandler(authUsecase)
 
+	photoRepo := photorepo.NewPhotoRepo(postgresCln)
+	photoUsecase := photousecase.NewPhotoUsecase(photoRepo)
+	photoHandler := photohandler.NewPhotoHandler(photoUsecase)
+
 	authMiddleware := middleware.NewAuthMiddleware(userUsecase)
 
 	router.NewUserRouter(ginEngine, userHandler, authMiddleware).Routers()
 	router.NewAuthRouter(ginEngine, authHandler, authMiddleware).Routers()
+	router.NewPhotoRouter(ginEngine, photoHandler, authMiddleware).Routers()
 
 	ginEngine.Serve()
 }

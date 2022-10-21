@@ -40,8 +40,7 @@ func (m *AuthMiddlewareImpl) CheckJWTAuth(ctx *gin.Context) {
 			"code": 97,
 			"type": "UNAUTHENTICATED",
 			"invalid_arg": gin.H{
-				"error_type":    "INVALID_TOKEN",
-				"error_message": err.Error(),
+				"error_type": "INVALID_TOKEN",
 			},
 		})
 		return
