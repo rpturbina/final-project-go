@@ -101,7 +101,7 @@ func (s *SocialMediaUsecaseImpl) GetSocialMediaByIdSvc(ctx context.Context, socm
 	if result.ID <= 0 {
 		log.Printf("social media with id %v not found", socmedId)
 
-		err = fmt.Errorf("socialMedia with id %v not found", socmedId)
+		err = fmt.Errorf("social media with id %v not found", socmedId)
 		errMsg = message.ErrorMessage{
 			Error: err,
 			Type:  "SOCIAL_MEDIA_NOT_FOUND",
