@@ -6,6 +6,7 @@ import (
 
 	"github.com/rpturbina/final-project-go/config/postgres"
 	"github.com/rpturbina/final-project-go/pkg/domain/socialmedia"
+	"gorm.io/gorm/clause"
 )
 
 type SocialMediaRepoImpl struct {
@@ -44,48 +45,48 @@ func (s *SocialMediaRepoImpl) GetSocialMedias(ctx context.Context, userId uint64
 	return result, err
 }
 
-// func (s *SocialMediaRepoImpl) GetSocialMediaById(ctx context.Context, socialMediaId uint64) (result socialMedia.SocialMedia, err error) {
-// 	log.Printf("%T - GetSocialMediaById is invoked\n", s)
-// 	defer log.Printf("%T - GetSocialMediaById executed\n", s)
+func (s *SocialMediaRepoImpl) GetSocialMediaById(ctx context.Context, socmedId uint64) (result socialmedia.SocialMedia, err error) {
+	log.Printf("%T - GetSocialMediaById is invoked\n", s)
+	defer log.Printf("%T - GetSocialMediaById executed\n", s)
 
-// 	db := s.pgCln.GetClient()
+	db := s.pgCln.GetClient()
 
-// 	err = db.Table("socialMedias").Where("id = ?", socialMediaId).Select("id", "message", "user_id", "photo_id").Find(&result).Error
+	err = db.Table("social_media").Where("id = ?", socmedId).Find(&result).Error
 
-// 	if err != nil {
-// 		log.Printf("error when getting socialMedia by id %v\n", socialMediaId)
-// 	}
+	if err != nil {
+		log.Printf("error when getting social media by id %v\n", socmedId)
+	}
 
-// 	return result, err
-// }
+	return result, err
+}
 
-// func (s *SocialMediaRepoImpl) UpdateSocialMedia(ctx context.Context, inputMessage string) (result socialMedia.SocialMedia, err error) {
-// 	log.Printf("%T - UpdateSocialMedia is invoked\n", s)
-// 	defer log.Printf("%T - UpdateSocialMedia executed\n", s)
+func (s *SocialMediaRepoImpl) UpdateSocialMedia(ctx context.Context, inputSocialMedia socialmedia.SocialMedia) (result socialmedia.SocialMedia, err error) {
+	log.Printf("%T - UpdateSocialMedia is invoked\n", s)
+	defer log.Printf("%T - UpdateSocialMedia executed\n", s)
 
-// 	socialMediaId := ctx.Value("socialMediaId").(uint64)
+	socmedId := ctx.Value("socmedId").(uint64)
 
-// 	db := s.pgCln.GetClient()
+	db := s.pgCln.GetClient()
 
-// 	err = db.Model(&result).Clauses(clause.Returning{Columns: []clause.Column{{Name: "id"}, {Name: "photo_id"}, {Name: "message"}, {Name: "user_id"}, {Name: "updated_at"}}}).Where("id = ?", socialMediaId).Updates(socialMedia.SocialMedia{Message: inputMessage}).Error
+	err = db.Model(&result).Clauses(clause.Returning{Columns: []clause.Column{{Name: "id"}, {Name: "name"}, {Name: "url"}, {Name: "user_id"}, {Name: "updated_at"}}}).Where("id = ?", socmedId).Updates(inputSocialMedia).Error
 
-// 	if err != nil {
-// 		log.Printf("error when updating socialMedia by id %v\n", socialMediaId)
-// 	}
+	if err != nil {
+		log.Printf("error when updating socialMedia by id %v\n", socmedId)
+	}
 
-// 	return result, err
-// }
+	return result, err
+}
 
-// func (s *SocialMediaRepoImpl) DeleteSocialMedia(ctx context.Context, socialMediaId uint64) (err error) {
+// func (s *SocialMediaRepoImpl) DeleteSocialMedia(ctx context.Context, socmedId uint64) (err error) {
 // 	log.Printf("%T - DeleteSocialMedia is invoked\n", s)
 // 	defer log.Printf("%T - DeleteSocialMedia executed\n", s)
 
 // 	db := s.pgCln.GetClient()
 
-// 	err = db.Where("id = ?", socialMediaId).Delete(&socialMedia.SocialMedia{}).Error
+// 	err = db.Where("id = ?", socmedId).Delete(&socialMedia.SocialMedia{}).Error
 
 // 	if err != nil {
-// 		log.Printf("error when deleting socialMedia by id %v \n", socialMediaId)
+// 		log.Printf("error when deleting socialMedia by id %v \n", socmedId)
 // 	}
 
 // 	return err

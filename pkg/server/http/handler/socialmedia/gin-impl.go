@@ -1,6 +1,7 @@
 package v1
 
 import (
+	"errors"
 	"fmt"
 	"log"
 	"net/http"
@@ -81,84 +82,84 @@ func (c *SocialMediaHdlImpl) GetSocialMediasHdl(ctx *gin.Context) {
 	})
 }
 
-// func (c *SocialMediaHdlImpl) UpdateSocialMediaHdl(ctx *gin.Context) {
-// 	log.Printf("%T - UpdateSocialMediaHdl is invoked\n", c)
-// 	defer log.Printf("%T - UpdateSocialMediaHdl executed\n", c)
+func (c *SocialMediaHdlImpl) UpdateSocialMediaHdl(ctx *gin.Context) {
+	log.Printf("%T - UpdateSocialMediaHdl is invoked\n", c)
+	defer log.Printf("%T - UpdateSocialMediaHdl executed\n", c)
 
-// 	log.Println("check socialMediaId from path parameter")
-// 	socialMediaIdParam := ctx.Param("socialMediaId")
+	log.Println("check social media id from path parameter")
+	socmedIdParam := ctx.Param("socialMediaId")
 
-// 	socialMediaId, err := strconv.ParseUint(socialMediaIdParam, 0, 64)
+	socmedId, err := strconv.ParseUint(socmedIdParam, 0, 64)
 
-// 	if err != nil {
-// 		ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
-// 			"code":    96,
-// 			"type":    "BAD_REQUEST",
-// 			"message": "invalid params",
-// 			"invalid_arg": gin.H{
-// 				"error_type":    "INVALID_PARAMS",
-// 				"error_message": "invalid params",
-// 			},
-// 		})
-// 		return
-// 	}
+	if err != nil {
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+			"code":    96,
+			"type":    "BAD_REQUEST",
+			"message": "invalid params",
+			"invalid_arg": gin.H{
+				"error_type":    "INVALID_PARAMS",
+				"error_message": "invalid params",
+			},
+		})
+		return
+	}
 
-// 	log.Println("calling get socialMedia by id usecase service")
-// 	result, errMsg := c.socialMediaUsecase.GetSocialMediaByIdSvc(ctx, socialMediaId)
+	log.Println("calling get social media by id usecase service")
+	result, errMsg := c.socialMediaUsecase.GetSocialMediaByIdSvc(ctx, socmedId)
 
-// 	if errMsg.Error != nil {
-// 		message.ErrorResponseSwitcher(ctx, errMsg)
-// 		return
-// 	}
+	if errMsg.Error != nil {
+		message.ErrorResponseSwitcher(ctx, errMsg)
+		return
+	}
 
-// 	stringUserId := ctx.Value("user").(string)
-// 	userId, _ := strconv.ParseUint(stringUserId, 0, 64)
+	stringUserId := ctx.Value("user").(string)
+	userId, _ := strconv.ParseUint(stringUserId, 0, 64)
 
-// 	log.Println("verify the socialMedia belongs to")
-// 	if result.UserID != userId {
-// 		message.ErrorResponseSwitcher(ctx, message.ErrorMessage{
-// 			Type:  "INVALID_SCOPE",
-// 			Error: errors.New("cannot update the socialMedia"),
-// 		})
-// 		return
-// 	}
+	log.Println("verify the social media belongs to")
+	if result.UserID != userId {
+		message.ErrorResponseSwitcher(ctx, message.ErrorMessage{
+			Type:  "INVALID_SCOPE",
+			Error: errors.New("cannot update the social media"),
+		})
+		return
+	}
 
-// 	var updatedSocialMedia socialMedia.SocialMedia
+	var updatedSocialMedia socialmedia.SocialMedia
 
-// 	log.Println("binding body payload from request")
-// 	if err := ctx.ShouldBindJSON(&updatedSocialMedia); err != nil {
-// 		message.ErrorResponseSwitcher(ctx, message.ErrorMessage{
-// 			Type:  "INVALID_PAYLOAD",
-// 			Error: errors.New("failed to bind payload"),
-// 		})
-// 		return
-// 	}
+	log.Println("binding body payload from request")
+	if err := ctx.ShouldBindJSON(&updatedSocialMedia); err != nil {
+		message.ErrorResponseSwitcher(ctx, message.ErrorMessage{
+			Type:  "INVALID_PAYLOAD",
+			Error: errors.New("failed to bind payload"),
+		})
+		return
+	}
 
-// 	ctx.Set("socialMediaId", socialMediaId)
+	ctx.Set("socmedId", socmedId)
 
-// 	updateResult, errMsg := c.socialMediaUsecase.UpdateSocialMediaSvc(ctx, updatedSocialMedia.Message)
+	updateResult, errMsg := c.socialMediaUsecase.UpdateSocialMediaSvc(ctx, updatedSocialMedia)
 
-// 	if errMsg.Error != nil {
-// 		message.ErrorResponseSwitcher(ctx, errMsg)
-// 		return
-// 	}
+	if errMsg.Error != nil {
+		message.ErrorResponseSwitcher(ctx, errMsg)
+		return
+	}
 
-// 	ctx.JSON(http.StatusOK, gin.H{
-// 		"code":    01,
-// 		"message": "socialMedia has been successfully updated",
-// 		"type":    "ACCEPTED",
-// 		"data":    updateResult,
-// 	})
-// }
+	ctx.JSON(http.StatusOK, gin.H{
+		"code":    01,
+		"message": "social media has been successfully updated",
+		"type":    "ACCEPTED",
+		"data":    updateResult,
+	})
+}
 
 // func (c *SocialMediaHdlImpl) DeleteSocialMediaHdl(ctx *gin.Context) {
 // 	log.Printf("%T - DeleteSocialMediaHdl is invoked\n", c)
 // 	defer log.Printf("%T - DeleteSocialMediaHdl executed\n", c)
 
-// 	log.Println("check socialMediaId from path parameter")
-// 	socialMediaIdParam := ctx.Param("socialMediaId")
+// 	log.Println("check socmedId from path parameter")
+// 	socialMediaIdParam := ctx.Param("socmedId")
 
-// 	socialMediaId, err := strconv.ParseUint(socialMediaIdParam, 0, 64)
+// 	socmedId, err := strconv.ParseUint(socialMediaIdParam, 0, 64)
 
 // 	if err != nil {
 // 		ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
@@ -174,7 +175,7 @@ func (c *SocialMediaHdlImpl) GetSocialMediasHdl(ctx *gin.Context) {
 // 	}
 
 // 	log.Println("calling get socialMedia by id usecase service")
-// 	result, errMsg := c.socialMediaUsecase.GetSocialMediaByIdSvc(ctx, socialMediaId)
+// 	result, errMsg := c.socialMediaUsecase.GetSocialMediaByIdSvc(ctx, socmedId)
 
 // 	if errMsg.Error != nil {
 // 		message.ErrorResponseSwitcher(ctx, errMsg)
@@ -194,7 +195,7 @@ func (c *SocialMediaHdlImpl) GetSocialMediasHdl(ctx *gin.Context) {
 // 	}
 
 // 	log.Println("calling delete socialMedia usecase service")
-// 	errMsg = c.socialMediaUsecase.DeleteSocialMediaSvc(ctx, socialMediaId)
+// 	errMsg = c.socialMediaUsecase.DeleteSocialMediaSvc(ctx, socmedId)
 
 // 	if errMsg.Error != nil {
 // 		message.ErrorResponseSwitcher(ctx, errMsg)

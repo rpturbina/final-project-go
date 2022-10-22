@@ -23,9 +23,9 @@ func (p *SocialMediaRouterImpl) post() {
 	p.routerGroup.POST("", p.authMiddleware.CheckJWTAuth, p.socialMediaHandler.CreateSocialMediaHdl)
 }
 
-// func (p *SocialMediaRouterImpl) put() {
-// 	p.routerGroup.PUT("/:socialMediaId", p.authMiddleware.CheckJWTAuth, p.socialMediaHandler.UpdateSocialMediaHdl)
-// }
+func (p *SocialMediaRouterImpl) put() {
+	p.routerGroup.PUT("/:socialMediaId", p.authMiddleware.CheckJWTAuth, p.socialMediaHandler.UpdateSocialMediaHdl)
+}
 
 // func (p *SocialMediaRouterImpl) delete() {
 // 	p.routerGroup.DELETE("/:socialMediaId", p.authMiddleware.CheckJWTAuth, p.socialMediaHandler.DeleteSocialMediaHdl)
@@ -34,7 +34,7 @@ func (p *SocialMediaRouterImpl) post() {
 func (p *SocialMediaRouterImpl) Routers() {
 	p.get()
 	p.post()
-	// p.put()
+	p.put()
 	// p.delete()
 }
 
