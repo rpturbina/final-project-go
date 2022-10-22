@@ -39,7 +39,7 @@ func (p *PhotoUsecaseImpl) CreatePhotoSvc(ctx context.Context, photo photo.Photo
 		case "invalid url format":
 			errMsg := message.ErrorMessage{
 				Error: err,
-				Type:  "INVALID_PHOTO_URL_FORMAT",
+				Type:  "INVALID_URL_FORMAT",
 			}
 			return result, errMsg
 		default:
@@ -149,7 +149,7 @@ func (p *PhotoUsecaseImpl) UpdatePhotoSvc(ctx context.Context, title string, cap
 	if !govalidator.IsURL(url) {
 		errMsg := message.ErrorMessage{
 			Error: errors.New("invalid url format"),
-			Type:  "INVALID_PHOTO_URL_FORMAT",
+			Type:  "INVALID_URL_FORMAT",
 		}
 		return result, errMsg
 	}

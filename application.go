@@ -12,16 +12,19 @@ import (
 	authrepo "github.com/rpturbina/final-project-go/pkg/repository/auth"
 	commentrepo "github.com/rpturbina/final-project-go/pkg/repository/comment"
 	photorepo "github.com/rpturbina/final-project-go/pkg/repository/photo"
+	socialmediarepo "github.com/rpturbina/final-project-go/pkg/repository/socialmedia"
 	userrepo "github.com/rpturbina/final-project-go/pkg/repository/user"
 	authhandler "github.com/rpturbina/final-project-go/pkg/server/http/handler/auth"
 	commenthandler "github.com/rpturbina/final-project-go/pkg/server/http/handler/comment"
 	photohandler "github.com/rpturbina/final-project-go/pkg/server/http/handler/photo"
+	socialmediahandler "github.com/rpturbina/final-project-go/pkg/server/http/handler/socialmedia"
 	userhandler "github.com/rpturbina/final-project-go/pkg/server/http/handler/user"
 	"github.com/rpturbina/final-project-go/pkg/server/http/middleware"
 	router "github.com/rpturbina/final-project-go/pkg/server/http/router/v1"
 	authusecase "github.com/rpturbina/final-project-go/pkg/usecase/auth"
 	commentusecase "github.com/rpturbina/final-project-go/pkg/usecase/comment"
 	photousecase "github.com/rpturbina/final-project-go/pkg/usecase/photo"
+	socialmediausecase "github.com/rpturbina/final-project-go/pkg/usecase/socialmedia"
 	userusecase "github.com/rpturbina/final-project-go/pkg/usecase/user"
 )
 
@@ -77,12 +80,17 @@ func main() {
 	commentUsecase := commentusecase.NewCommentUsecase(commentRepo, photoUsecase)
 	commentHandler := commenthandler.NewCommentHandler(commentUsecase)
 
+	socialMediaRepo := socialmediarepo.NewSocialMediaRepo(postgresCln)
+	socialMediaUsecase := socialmediausecase.NewSocialMediaUsecase(socialMediaRepo)
+	socialMediaHandler := socialmediahandler.NewSocialMediaHandler(socialMediaUsecase)
+
 	authMiddleware := middleware.NewAuthMiddleware(userUsecase)
 
 	router.NewUserRouter(ginEngine, userHandler, authMiddleware).Routers()
 	router.NewAuthRouter(ginEngine, authHandler, authMiddleware).Routers()
 	router.NewPhotoRouter(ginEngine, photoHandler, authMiddleware).Routers()
 	router.NewCommentRouter(ginEngine, commentHandler, authMiddleware).Routers()
+	router.NewSocialMediaRouter(ginEngine, socialMediaHandler, authMiddleware).Routers()
 
 	ginEngine.Serve()
 }
