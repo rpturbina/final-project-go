@@ -39,10 +39,10 @@ func (a *AuthHdlImpl) LoginUserHdl(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusCreated, gin.H{
-		"code":    01,
+	ctx.JSON(http.StatusOK, gin.H{
+		"code":    00,
 		"message": "successfully login",
-		"type":    "ACCEPTED",
+		"type":    "SUCCESS",
 		"data": gin.H{
 			"access_token":  accessToken,
 			"refresh_token": refreshToken,
@@ -62,8 +62,8 @@ func (a *AuthHdlImpl) GetRefreshTokenHdl(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusCreated, gin.H{
-		"code":    01,
+	ctx.JSON(http.StatusOK, gin.H{
+		"code":    00,
 		"message": "token refreshed successfully",
 		"type":    "ACCEPTED",
 		"data": gin.H{

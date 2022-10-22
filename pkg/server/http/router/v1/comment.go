@@ -15,9 +15,9 @@ type CommentRouterImpl struct {
 	authMiddleware middleware.AuthMiddleware
 }
 
-// func (p *CommentRouterImpl) get() {
-// 	p.routerGroup.GET("", p.authMiddleware.CheckJWTAuth, p.commentHandler.GetCommentsHdl)
-// }
+func (p *CommentRouterImpl) get() {
+	p.routerGroup.GET("", p.authMiddleware.CheckJWTAuth, p.commentHandler.GetCommentsHdl)
+}
 
 func (p *CommentRouterImpl) post() {
 	p.routerGroup.POST("", p.authMiddleware.CheckJWTAuth, p.commentHandler.CreateCommentHdl)
@@ -32,7 +32,7 @@ func (p *CommentRouterImpl) post() {
 // }
 
 func (p *CommentRouterImpl) Routers() {
-	// p.get()
+	p.get()
 	p.post()
 	// p.put()
 	// p.delete()

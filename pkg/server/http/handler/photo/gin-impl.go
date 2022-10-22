@@ -75,7 +75,7 @@ func (p *PhotoHdlImpl) GetPhotosHdl(ctx *gin.Context) {
 			return
 		}
 
-		ctx.JSON(http.StatusCreated, gin.H{
+		ctx.JSON(http.StatusOK, gin.H{
 			"code":    00,
 			"message": fmt.Sprintf("photos id %v is found", photoId),
 			"type":    "SUCCESS",
@@ -126,7 +126,7 @@ func (p *PhotoHdlImpl) GetPhotosHdl(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusCreated, gin.H{
+	ctx.JSON(http.StatusOK, gin.H{
 		"code":    00,
 		"message": fmt.Sprintf("photos by user id %v is found", userId),
 		"type":    "SUCCESS",
@@ -197,9 +197,9 @@ func (p *PhotoHdlImpl) UpdatePhotoHdl(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusOK, gin.H{
-		"code":    01,
+		"code":    00,
 		"message": "photo has been successfully updated",
-		"type":    "ACCEPTED",
+		"type":    "SUCCESS",
 		"data":    result,
 	})
 }
@@ -255,9 +255,9 @@ func (p *PhotoHdlImpl) DeletePhotoHdl(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusOK, gin.H{
-		"code":    01,
+		"code":    00,
 		"message": "photo has been successfully deleted",
-		"type":    "ACCEPTED",
+		"type":    "SUCCESS",
 	})
 }
 

@@ -138,9 +138,9 @@ func (u *UserHdlImpl) UpdateUserHdl(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusOK, gin.H{
-		"code":    01,
+		"code":    00,
 		"message": "user has been successfully updated",
-		"type":    "ACCEPTED",
+		"type":    "SUCCESS",
 		"data": gin.H{
 			"id_token": idToken,
 		},
@@ -163,9 +163,9 @@ func (u *UserHdlImpl) DeleteUserHdl(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusOK, gin.H{
-		"code":    01,
+		"code":    00,
 		"message": "Your account has been successfully deleted",
-		"type":    "ACCEPTED",
+		"type":    "SUCCESS",
 	})
 }
 

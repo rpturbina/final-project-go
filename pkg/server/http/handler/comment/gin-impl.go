@@ -1,8 +1,10 @@
 package v1
 
 import (
+	"fmt"
 	"log"
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"github.com/rpturbina/final-project-go/pkg/domain/comment"
@@ -55,80 +57,29 @@ func (p *CommentHdlImpl) CreateCommentHdl(ctx *gin.Context) {
 	})
 }
 
-// func (p *CommentHdlImpl) GetCommentsHdl(ctx *gin.Context) {
-// 	log.Printf("%T - GetCommentsByUserIdHdl is invoked\n", p)
-// 	defer log.Printf("%T - GetCommentsByUserIdHdl executed\n", p)
+func (p *CommentHdlImpl) GetCommentsHdl(ctx *gin.Context) {
+	log.Printf("%T - GetCommentsIdHdl is invoked\n", p)
+	defer log.Printf("%T - GetCommentsHdl executed\n", p)
 
-// 	stringCommentId, isCommentIdExist := ctx.GetQuery("id")
+	stringUserId := ctx.Value("user").(string)
 
-// 	if isCommentIdExist {
-// 		commentId, _ := strconv.ParseUint(stringCommentId, 0, 64)
-// 		log.Println("calling get comments by id usecase service")
-// 		result, errMsg := p.commentUsecase.GetCommentByIdSvc(ctx, commentId)
+	userId, _ := strconv.ParseUint(stringUserId, 0, 64)
 
-// 		if errMsg.Error != nil {
-// 			message.ErrorResponseSwitcher(ctx, errMsg)
-// 			return
-// 		}
+	log.Println("calling get comments by user id usecase service")
+	result, errMsg := p.commentUsecase.GetCommentsSvc(ctx)
 
-// 		ctx.JSON(http.StatusCreated, gin.H{
-// 			"code":    00,
-// 			"message": fmt.Sprintf("comments id %v is found", commentId),
-// 			"type":    "SUCCESS",
-// 			"data":    result,
-// 		})
-// 		return
-// 	}
+	if errMsg.Error != nil {
+		message.ErrorResponseSwitcher(ctx, errMsg)
+		return
+	}
 
-// 	if isCommentIdExist && stringCommentId == "" {
-// 		ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
-// 			"code":    96,
-// 			"type":    "BAD_REQUEST",
-// 			"message": "invalid params",
-// 			"invalid_arg": gin.H{
-// 				"error_type":    "INVALID_PARAMS",
-// 				"error_message": "invalid params",
-// 			},
-// 		})
-// 		return
-// 	}
-
-// 	stringUserId, isUserIdExist := ctx.GetQuery("user_id")
-
-// 	if isUserIdExist && stringUserId == "" {
-// 		ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
-// 			"code":    96,
-// 			"type":    "BAD_REQUEST",
-// 			"message": "invalid params",
-// 			"invalid_arg": gin.H{
-// 				"error_type":    "INVALID_PARAMS",
-// 				"error_message": "invalid params",
-// 			},
-// 		})
-// 		return
-// 	}
-
-// 	if !isUserIdExist {
-// 		stringUserId = ctx.Value("user").(string)
-// 	}
-
-// 	userId, _ := strconv.ParseUint(stringUserId, 0, 64)
-
-// 	log.Println("calling get comments by user id usecase service")
-// 	result, errMsg := p.commentUsecase.GetCommentsByUserIdSvc(ctx, userId)
-
-// 	if errMsg.Error != nil {
-// 		message.ErrorResponseSwitcher(ctx, errMsg)
-// 		return
-// 	}
-
-// 	ctx.JSON(http.StatusCreated, gin.H{
-// 		"code":    00,
-// 		"message": fmt.Sprintf("comments by user id %v is found", userId),
-// 		"type":    "SUCCESS",
-// 		"data":    result,
-// 	})
-// }
+	ctx.JSON(http.StatusOK, gin.H{
+		"code":    00,
+		"message": fmt.Sprintf("comments by user id %v is found", userId),
+		"type":    "SUCCESS",
+		"data":    result,
+	})
+}
 
 // func (p *CommentHdlImpl) UpdateCommentHdl(ctx *gin.Context) {
 // 	log.Printf("%T - UpdateCommentHdl is invoked\n", p)

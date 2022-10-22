@@ -70,31 +70,28 @@ func (c *CommentUsecaseImpl) CreateCommentSvc(ctx context.Context, comment comme
 	return result, errMsg
 }
 
-// func (c *CommentUsecaseImpl) GetCommentsByUserIdSvc(ctx context.Context, userId uint64) (result []comment.Comment, errMsg message.ErrorMessage) {
-// 	log.Printf("%T - GetCommentsByUserIdSvc is invoked\n", c)
-// 	defer log.Printf("%T - GetCommentsByUserIdSvc executed\n", c)
+func (c *CommentUsecaseImpl) GetCommentsSvc(ctx context.Context) (result []comment.Comment, errMsg message.ErrorMessage) {
+	log.Printf("%T - GetCommentsSvc is invoked\n", c)
+	defer log.Printf("%T - GetCommentsSvc executed\n", c)
 
-// 	log.Println("calling get user by id repo")
-// 	checkUserId, errMsg := c.userUsecase.GetUserByIdSvc(ctx, userId)
+	stringUserId := ctx.Value("user").(string)
 
-// 	if checkUserId.ID <= 0 {
-// 		return result, errMsg
-// 	}
+	userId, _ := strconv.ParseUint(stringUserId, 0, 64)
 
-// 	log.Println("calling get comment by userid repo")
-// 	result, err := c.commentRepo.GetCommentsByUserId(ctx, userId)
+	log.Println("calling get comment by userid repo")
+	result, err := c.commentRepo.GetComments(ctx, userId)
 
-// 	if err != nil {
-// 		log.Printf("error when fetching data from database: %s\n", err.Error())
-// 		errMsg = message.ErrorMessage{
-// 			Error: err,
-// 			Type:  "INTERNAL_CONNECTION_PROBLEM",
-// 		}
-// 		return result, errMsg
-// 	}
+	if err != nil {
+		log.Printf("error when fetching data from database: %s\n", err.Error())
+		errMsg = message.ErrorMessage{
+			Error: err,
+			Type:  "INTERNAL_CONNECTION_PROBLEM",
+		}
+		return result, errMsg
+	}
 
-// 	return result, errMsg
-// }
+	return result, errMsg
+}
 
 // func (c *CommentUsecaseImpl) GetCommentByIdSvc(ctx context.Context, commentId uint64) (result comment.Comment, errMsg message.ErrorMessage) {
 // 	log.Printf("%T - GetCommentByIdSvc is invoked\n", c)
