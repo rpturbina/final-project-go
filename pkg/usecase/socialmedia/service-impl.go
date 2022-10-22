@@ -168,24 +168,24 @@ func (s *SocialMediaUsecaseImpl) UpdateSocialMediaSvc(ctx context.Context, input
 	return result, errMsg
 }
 
-// func (s *SocialMediaUsecaseImpl) DeleteSocialMediaSvc(ctx context.Context, socmedId uint64) (errMsg message.ErrorMessage) {
-// 	log.Printf("%T - DeleteSocialMediaSvc is invoked\n", s)
-// 	defer log.Printf("%T - DeleteSocialMediaSvc executed\n", s)
+func (s *SocialMediaUsecaseImpl) DeleteSocialMediaSvc(ctx context.Context, socmedId uint64) (errMsg message.ErrorMessage) {
+	log.Printf("%T - DeleteSocialMediaSvc is invoked\n", s)
+	defer log.Printf("%T - DeleteSocialMediaSvc executed\n", s)
 
-// 	log.Println("calling delete socialMedia repo")
-// 	err := s.socialMediaRepo.DeleteSocialMedia(ctx, socmedId)
+	log.Println("calling delete socialMedia repo")
+	err := s.socialMediaRepo.DeleteSocialMedia(ctx, socmedId)
 
-// 	if err != nil {
-// 		log.Printf("error when fetching data from database: %s\n", err.Error())
-// 		errMsg = message.ErrorMessage{
-// 			Error: err,
-// 			Type:  "INTERNAL_CONNECTION_PROBLEM",
-// 		}
-// 		return errMsg
-// 	}
+	if err != nil {
+		log.Printf("error when fetching data from database: %s\n", err.Error())
+		errMsg = message.ErrorMessage{
+			Error: err,
+			Type:  "INTERNAL_CONNECTION_PROBLEM",
+		}
+		return errMsg
+	}
 
-// 	return errMsg
-// }
+	return errMsg
+}
 
 func NewSocialMediaUsecase(socialMediaRepo socialmedia.SocialMediaRepo) socialmedia.SocialMediaUsecase {
 	return &SocialMediaUsecaseImpl{socialMediaRepo: socialMediaRepo}

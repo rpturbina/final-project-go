@@ -152,62 +152,62 @@ func (c *SocialMediaHdlImpl) UpdateSocialMediaHdl(ctx *gin.Context) {
 	})
 }
 
-// func (c *SocialMediaHdlImpl) DeleteSocialMediaHdl(ctx *gin.Context) {
-// 	log.Printf("%T - DeleteSocialMediaHdl is invoked\n", c)
-// 	defer log.Printf("%T - DeleteSocialMediaHdl executed\n", c)
+func (c *SocialMediaHdlImpl) DeleteSocialMediaHdl(ctx *gin.Context) {
+	log.Printf("%T - DeleteSocialMediaHdl is invoked\n", c)
+	defer log.Printf("%T - DeleteSocialMediaHdl executed\n", c)
 
-// 	log.Println("check socmedId from path parameter")
-// 	socialMediaIdParam := ctx.Param("socmedId")
+	log.Println("check socmedId from path parameter")
+	socmedIdParam := ctx.Param("socialMediaId")
 
-// 	socmedId, err := strconv.ParseUint(socialMediaIdParam, 0, 64)
+	socmedId, err := strconv.ParseUint(socmedIdParam, 0, 64)
 
-// 	if err != nil {
-// 		ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
-// 			"code":    96,
-// 			"type":    "BAD_REQUEST",
-// 			"message": "invalid params",
-// 			"invalid_arg": gin.H{
-// 				"error_type":    "INVALID_PARAMS",
-// 				"error_message": "invalid params",
-// 			},
-// 		})
-// 		return
-// 	}
+	if err != nil {
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+			"code":    96,
+			"type":    "BAD_REQUEST",
+			"message": "invalid params",
+			"invalid_arg": gin.H{
+				"error_type":    "INVALID_PARAMS",
+				"error_message": "invalid params",
+			},
+		})
+		return
+	}
 
-// 	log.Println("calling get socialMedia by id usecase service")
-// 	result, errMsg := c.socialMediaUsecase.GetSocialMediaByIdSvc(ctx, socmedId)
+	log.Println("calling get social media by id usecase service")
+	result, errMsg := c.socialMediaUsecase.GetSocialMediaByIdSvc(ctx, socmedId)
 
-// 	if errMsg.Error != nil {
-// 		message.ErrorResponseSwitcher(ctx, errMsg)
-// 		return
-// 	}
+	if errMsg.Error != nil {
+		message.ErrorResponseSwitcher(ctx, errMsg)
+		return
+	}
 
-// 	stringUserId := ctx.Value("user").(string)
-// 	userId, _ := strconv.ParseUint(stringUserId, 0, 64)
+	stringUserId := ctx.Value("user").(string)
+	userId, _ := strconv.ParseUint(stringUserId, 0, 64)
 
-// 	log.Println("verify the socialMedia belongs to")
-// 	if result.UserID != userId {
-// 		message.ErrorResponseSwitcher(ctx, message.ErrorMessage{
-// 			Type:  "INVALID_SCOPE",
-// 			Error: errors.New("cannot delete the socialMedia"),
-// 		})
-// 		return
-// 	}
+	log.Println("verify the social media belongs to")
+	if result.UserID != userId {
+		message.ErrorResponseSwitcher(ctx, message.ErrorMessage{
+			Type:  "INVALID_SCOPE",
+			Error: errors.New("cannot delete the social media"),
+		})
+		return
+	}
 
-// 	log.Println("calling delete socialMedia usecase service")
-// 	errMsg = c.socialMediaUsecase.DeleteSocialMediaSvc(ctx, socmedId)
+	log.Println("calling delete social media usecase service")
+	errMsg = c.socialMediaUsecase.DeleteSocialMediaSvc(ctx, socmedId)
 
-// 	if errMsg.Error != nil {
-// 		message.ErrorResponseSwitcher(ctx, errMsg)
-// 		return
-// 	}
+	if errMsg.Error != nil {
+		message.ErrorResponseSwitcher(ctx, errMsg)
+		return
+	}
 
-// 	ctx.JSON(http.StatusOK, gin.H{
-// 		"code":    01,
-// 		"message": "socialMedia has been successfully deleted",
-// 		"type":    "ACCEPTED",
-// 	})
-// }
+	ctx.JSON(http.StatusOK, gin.H{
+		"code":    01,
+		"message": "social media has been successfully deleted",
+		"type":    "ACCEPTED",
+	})
+}
 
 func NewSocialMediaHandler(socialMediaUsecase socialmedia.SocialMediaUsecase) socialmedia.SocialMediaHandler {
 	return &SocialMediaHdlImpl{socialMediaUsecase: socialMediaUsecase}

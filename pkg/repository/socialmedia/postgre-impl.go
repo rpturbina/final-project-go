@@ -77,20 +77,20 @@ func (s *SocialMediaRepoImpl) UpdateSocialMedia(ctx context.Context, inputSocial
 	return result, err
 }
 
-// func (s *SocialMediaRepoImpl) DeleteSocialMedia(ctx context.Context, socmedId uint64) (err error) {
-// 	log.Printf("%T - DeleteSocialMedia is invoked\n", s)
-// 	defer log.Printf("%T - DeleteSocialMedia executed\n", s)
+func (s *SocialMediaRepoImpl) DeleteSocialMedia(ctx context.Context, socmedId uint64) (err error) {
+	log.Printf("%T - DeleteSocialMedia is invoked\n", s)
+	defer log.Printf("%T - DeleteSocialMedia executed\n", s)
 
-// 	db := s.pgCln.GetClient()
+	db := s.pgCln.GetClient()
 
-// 	err = db.Where("id = ?", socmedId).Delete(&socialMedia.SocialMedia{}).Error
+	err = db.Where("id = ?", socmedId).Delete(&socialmedia.SocialMedia{}).Error
 
-// 	if err != nil {
-// 		log.Printf("error when deleting socialMedia by id %v \n", socmedId)
-// 	}
+	if err != nil {
+		log.Printf("error when deleting social media by id %v \n", socmedId)
+	}
 
-// 	return err
-// }
+	return err
+}
 
 func NewSocialMediaRepo(pgCln postgres.PostgresClient) socialmedia.SocialMediaRepo {
 	return &SocialMediaRepoImpl{pgCln: pgCln}

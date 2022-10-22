@@ -11,5 +11,5 @@ type SocialMediaUsecase interface {
 	GetSocialMediasSvc(ctx context.Context) (result []SocialMedia, errMsg message.ErrorMessage)
 	GetSocialMediaByIdSvc(ctx context.Context, socmedId uint64) (result SocialMedia, errMsg message.ErrorMessage)
 	UpdateSocialMediaSvc(ctx context.Context, socialMedia SocialMedia) (result SocialMedia, errMsg message.ErrorMessage)
-	// DeleteSocialMediaSvc(ctx context.Context, socialMediaId uint64) (errMsg message.ErrorMessage)
+	DeleteSocialMediaSvc(ctx context.Context, socmedId uint64) (errMsg message.ErrorMessage)
 }
