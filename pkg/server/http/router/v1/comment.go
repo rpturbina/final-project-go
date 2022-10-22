@@ -23,9 +23,9 @@ func (p *CommentRouterImpl) post() {
 	p.routerGroup.POST("", p.authMiddleware.CheckJWTAuth, p.commentHandler.CreateCommentHdl)
 }
 
-// func (p *CommentRouterImpl) put() {
-// 	p.routerGroup.PUT("/:commentId", p.authMiddleware.CheckJWTAuth, p.commentHandler.UpdateCommentHdl)
-// }
+func (p *CommentRouterImpl) put() {
+	p.routerGroup.PUT("/:commentId", p.authMiddleware.CheckJWTAuth, p.commentHandler.UpdateCommentHdl)
+}
 
 // func (p *CommentRouterImpl) delete() {
 // 	p.routerGroup.DELETE("/:commentId", p.authMiddleware.CheckJWTAuth, p.commentHandler.DeleteCommentHdl)
@@ -34,7 +34,7 @@ func (p *CommentRouterImpl) post() {
 func (p *CommentRouterImpl) Routers() {
 	p.get()
 	p.post()
-	// p.put()
+	p.put()
 	// p.delete()
 }
 

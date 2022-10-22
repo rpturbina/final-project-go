@@ -2,6 +2,8 @@ package comment
 
 import (
 	"context"
+	"errors"
+	"fmt"
 	"log"
 	"strconv"
 
@@ -93,76 +95,61 @@ func (c *CommentUsecaseImpl) GetCommentsSvc(ctx context.Context) (result []comme
 	return result, errMsg
 }
 
-// func (c *CommentUsecaseImpl) GetCommentByIdSvc(ctx context.Context, commentId uint64) (result comment.Comment, errMsg message.ErrorMessage) {
-// 	log.Printf("%T - GetCommentByIdSvc is invoked\n", c)
-// 	defer log.Printf("%T - GetCommentByIdSvc executed\n", c)
+func (c *CommentUsecaseImpl) GetCommentByIdSvc(ctx context.Context, commentId uint64) (result comment.Comment, errMsg message.ErrorMessage) {
+	log.Printf("%T - GetCommentByIdSvc is invoked\n", c)
+	defer log.Printf("%T - GetCommentByIdSvc executed\n", c)
 
-// 	log.Println("calling get comment by id repo")
-// 	result, err := c.commentRepo.GetCommentById(ctx, commentId)
+	log.Println("calling get comment by id repo")
+	result, err := c.commentRepo.GetCommentById(ctx, commentId)
 
-// 	if result.ID <= 0 {
-// 		log.Printf("comment with id %v not found", commentId)
+	if result.ID <= 0 {
+		log.Printf("comment with id %v not found", commentId)
 
-// 		err = fmt.Errorf("comment with id %v not found", commentId)
-// 		errMsg = message.ErrorMessage{
-// 			Error: err,
-// 			Type:  "PHOTO_NOT_FOUND",
-// 		}
-// 		return result, errMsg
-// 	}
+		err = fmt.Errorf("comment with id %v not found", commentId)
+		errMsg = message.ErrorMessage{
+			Error: err,
+			Type:  "COMMENT_NOT_FOUND",
+		}
+		return result, errMsg
+	}
 
-// 	if err != nil {
-// 		log.Printf("error when fetching data from database: %s\n", err.Error())
-// 		errMsg = message.ErrorMessage{
-// 			Error: err,
-// 			Type:  "INTERNAL_CONNECTION_PROBLEM",
-// 		}
-// 		return result, errMsg
-// 	}
+	if err != nil {
+		log.Printf("error when fetching data from database: %s\n", err.Error())
+		errMsg = message.ErrorMessage{
+			Error: err,
+			Type:  "INTERNAL_CONNECTION_PROBLEM",
+		}
+		return result, errMsg
+	}
 
-// 	return result, errMsg
-// }
+	return result, errMsg
+}
 
-// func (c *CommentUsecaseImpl) UpdateCommentSvc(ctx context.Context, title string, caption string, url string) (result comment.Comment, errMsg message.ErrorMessage) {
-// 	log.Printf("%T - UpdateCommentSvc is invoked\n", c)
-// 	defer log.Printf("%T - UpdateCommentSvc executed\n", c)
+func (c *CommentUsecaseImpl) UpdateCommentSvc(ctx context.Context, inputMessage string) (result comment.Comment, errMsg message.ErrorMessage) {
+	log.Printf("%T - UpdateCommentSvc is invoked\n", c)
+	defer log.Printf("%T - UpdateCommentSvc executed\n", c)
 
-// 	if title == "" {
-// 		errMsg := message.ErrorMessage{
-// 			Error: errors.New("comment title is required"),
-// 			Type:  "PHOTO_TITLE_IS_EMPTY",
-// 		}
-// 		return result, errMsg
-// 	}
-// 	if url == "" {
-// 		errMsg := message.ErrorMessage{
-// 			Error: errors.New("comment url is required"),
-// 			Type:  "PHOTO_URL_IS_EMPTY",
-// 		}
-// 		return result, errMsg
-// 	}
+	if inputMessage == "" {
+		errMsg := message.ErrorMessage{
+			Error: errors.New("comment message is required"),
+			Type:  "COMMENT_MESSAGE_IS_EMPTY",
+		}
+		return result, errMsg
+	}
 
-// 	if !govalidator.IsURL(url) {
-// 		errMsg := message.ErrorMessage{
-// 			Error: errors.New("invalid url format"),
-// 			Type:  "INVALID_PHOTO_URL_FORMAT",
-// 		}
-// 		return result, errMsg
-// 	}
+	result, err := c.commentRepo.UpdateComment(ctx, inputMessage)
 
-// 	result, err := c.commentRepo.UpdateComment(ctx, title, caption, url)
+	if err != nil {
+		log.Printf("error when fetching data from database: %s\n", err.Error())
+		errMsg = message.ErrorMessage{
+			Error: err,
+			Type:  "INTERNAL_CONNECTION_PROBLEM",
+		}
+		return result, errMsg
+	}
 
-// 	if err != nil {
-// 		log.Printf("error when fetching data from database: %s\n", err.Error())
-// 		errMsg = message.ErrorMessage{
-// 			Error: err,
-// 			Type:  "INTERNAL_CONNECTION_PROBLEM",
-// 		}
-// 		return result, errMsg
-// 	}
-
-// 	return result, errMsg
-// }
+	return result, errMsg
+}
 
 // func (c *CommentUsecaseImpl) DeleteCommentSvc(ctx context.Context, commentId uint64) (errMsg message.ErrorMessage) {
 // 	log.Printf("%T - DeleteCommentSvc is invoked\n", c)
