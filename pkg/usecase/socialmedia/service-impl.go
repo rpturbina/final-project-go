@@ -67,28 +67,28 @@ func (s *SocialMediaUsecaseImpl) CreateSocialMediaSvc(ctx context.Context, socia
 	return result, errMsg
 }
 
-// func (s *SocialMediaUsecaseImpl) GetSocialMediasSvc(ctx context.Context) (result []socialMedia.SocialMedia, errMsg message.ErrorMessage) {
-// 	log.Printf("%T - GetSocialMediasSvc is invoked\n", s)
-// 	defer log.Printf("%T - GetSocialMediasSvc executed\n", s)
+func (s *SocialMediaUsecaseImpl) GetSocialMediasSvc(ctx context.Context) (result []socialmedia.SocialMedia, errMsg message.ErrorMessage) {
+	log.Printf("%T - GetSocialMediasSvc is invoked\n", s)
+	defer log.Printf("%T - GetSocialMediasSvc executed\n", s)
 
-// 	stringUserId := ctx.Value("user").(string)
+	stringUserId := ctx.Value("user").(string)
 
-// 	userId, _ := strconv.ParseUint(stringUserId, 0, 64)
+	userId, _ := strconv.ParseUint(stringUserId, 0, 64)
 
-// 	log.Println("calling get socialMedia by userid repo")
-// 	result, err := s.socialMediaRepo.GetSocialMedias(ctx, userId)
+	log.Println("calling get social media by user id repo")
+	result, err := s.socialMediaRepo.GetSocialMedias(ctx, userId)
 
-// 	if err != nil {
-// 		log.Printf("error when fetching data from database: %s\n", err.Error())
-// 		errMsg = message.ErrorMessage{
-// 			Error: err,
-// 			Type:  "INTERNAL_CONNECTION_PROBLEM",
-// 		}
-// 		return result, errMsg
-// 	}
+	if err != nil {
+		log.Printf("error when fetching data from database: %s\n", err.Error())
+		errMsg = message.ErrorMessage{
+			Error: err,
+			Type:  "INTERNAL_CONNECTION_PROBLEM",
+		}
+		return result, errMsg
+	}
 
-// 	return result, errMsg
-// }
+	return result, errMsg
+}
 
 // func (s *SocialMediaUsecaseImpl) GetSocialMediaByIdSvc(ctx context.Context, socialMediaId uint64) (result socialMedia.SocialMedia, errMsg message.ErrorMessage) {
 // 	log.Printf("%T - GetSocialMediaByIdSvc is invoked\n", s)

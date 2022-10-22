@@ -29,20 +29,20 @@ func (s *SocialMediaRepoImpl) CreateSocialMedia(ctx context.Context, inputSocial
 	return result, err
 }
 
-// func (s *SocialMediaRepoImpl) GetSocialMedias(ctx context.Context, userId uint64) (result []socialMedia.SocialMedia, err error) {
-// 	log.Printf("%T - GetSocialMedias is invoked\n", s)
-// 	defer log.Printf("%T - GetSocialMedias executed\n", s)
+func (s *SocialMediaRepoImpl) GetSocialMedias(ctx context.Context, userId uint64) (result []socialmedia.SocialMedia, err error) {
+	log.Printf("%T - GetSocialMedias is invoked\n", s)
+	defer log.Printf("%T - GetSocialMedias executed\n", s)
 
-// 	db := s.pgCln.GetClient()
+	db := s.pgCln.GetClient()
 
-// 	err = db.Model(&socialMedia.SocialMedia{}).Where("user_id = ?", userId).Find(&result).Error
+	err = db.Model(&socialmedia.SocialMedia{}).Where("user_id = ?", userId).Find(&result).Error
 
-// 	if err != nil {
-// 		log.Printf("error when getting photos by user id %v\n", userId)
-// 	}
+	if err != nil {
+		log.Printf("error when getting social media by user id %v\n", userId)
+	}
 
-// 	return result, err
-// }
+	return result, err
+}
 
 // func (s *SocialMediaRepoImpl) GetSocialMediaById(ctx context.Context, socialMediaId uint64) (result socialMedia.SocialMedia, err error) {
 // 	log.Printf("%T - GetSocialMediaById is invoked\n", s)

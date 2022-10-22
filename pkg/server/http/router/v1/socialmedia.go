@@ -15,9 +15,9 @@ type SocialMediaRouterImpl struct {
 	authMiddleware     middleware.AuthMiddleware
 }
 
-// func (p *SocialMediaRouterImpl) get() {
-// 	p.routerGroup.GET("", p.authMiddleware.CheckJWTAuth, p.socialMediaHandler.GetSocialMediasHdl)
-// }
+func (p *SocialMediaRouterImpl) get() {
+	p.routerGroup.GET("", p.authMiddleware.CheckJWTAuth, p.socialMediaHandler.GetSocialMediasHdl)
+}
 
 func (p *SocialMediaRouterImpl) post() {
 	p.routerGroup.POST("", p.authMiddleware.CheckJWTAuth, p.socialMediaHandler.CreateSocialMediaHdl)
@@ -32,7 +32,7 @@ func (p *SocialMediaRouterImpl) post() {
 // }
 
 func (p *SocialMediaRouterImpl) Routers() {
-	// p.get()
+	p.get()
 	p.post()
 	// p.put()
 	// p.delete()

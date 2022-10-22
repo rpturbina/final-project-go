@@ -1,8 +1,10 @@
 package v1
 
 import (
+	"fmt"
 	"log"
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"github.com/rpturbina/final-project-go/pkg/domain/message"
@@ -55,29 +57,29 @@ func (c *SocialMediaHdlImpl) CreateSocialMediaHdl(ctx *gin.Context) {
 	})
 }
 
-// func (c *SocialMediaHdlImpl) GetSocialMediasHdl(ctx *gin.Context) {
-// 	log.Printf("%T - GetSocialMediasIdHdl is invoked\n", c)
-// 	defer log.Printf("%T - GetSocialMediasHdl executed\n", c)
+func (c *SocialMediaHdlImpl) GetSocialMediasHdl(ctx *gin.Context) {
+	log.Printf("%T - GetSocialMediasIdHdl is invoked\n", c)
+	defer log.Printf("%T - GetSocialMediasHdl executed\n", c)
 
-// 	stringUserId := ctx.Value("user").(string)
+	stringUserId := ctx.Value("user").(string)
 
-// 	userId, _ := strconv.ParseUint(stringUserId, 0, 64)
+	userId, _ := strconv.ParseUint(stringUserId, 0, 64)
 
-// 	log.Println("calling get socialMedias by user id usecase service")
-// 	result, errMsg := c.socialMediaUsecase.GetSocialMediasSvc(ctx)
+	log.Println("calling get social medias usecase service")
+	result, errMsg := c.socialMediaUsecase.GetSocialMediasSvc(ctx)
 
-// 	if errMsg.Error != nil {
-// 		message.ErrorResponseSwitcher(ctx, errMsg)
-// 		return
-// 	}
+	if errMsg.Error != nil {
+		message.ErrorResponseSwitcher(ctx, errMsg)
+		return
+	}
 
-// 	ctx.JSON(http.StatusOK, gin.H{
-// 		"code":    00,
-// 		"message": fmt.Sprintf("socialMedias by user id %v is found", userId),
-// 		"type":    "SUCCESS",
-// 		"data":    result,
-// 	})
-// }
+	ctx.JSON(http.StatusOK, gin.H{
+		"code":    00,
+		"message": fmt.Sprintf("social medias by user id %v is found", userId),
+		"type":    "SUCCESS",
+		"data":    result,
+	})
+}
 
 // func (c *SocialMediaHdlImpl) UpdateSocialMediaHdl(ctx *gin.Context) {
 // 	log.Printf("%T - UpdateSocialMediaHdl is invoked\n", c)
