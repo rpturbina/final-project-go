@@ -11,5 +11,5 @@ type PhotoUsecase interface {
 	GetPhotosByUserIdSvc(ctx context.Context, userId uint64) (result []Photo, errMsg message.ErrorMessage)
 	GetPhotoByIdSvc(ctx context.Context, photoId uint64) (result Photo, errMsg message.ErrorMessage)
 	UpdatePhotoSvc(ctx context.Context, title string, caption string, url string) (result Photo, errMsg message.ErrorMessage)
-	DeletePhotoSvc(ctx context.Context, userId uint64) (errMsg message.ErrorMessage)
+	DeletePhotoSvc(ctx context.Context, photoId uint64) (errMsg message.ErrorMessage)
 }

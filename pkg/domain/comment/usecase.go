@@ -11,4 +11,5 @@ type CommentUsecase interface {
 	GetCommentsSvc(ctx context.Context) (result []Comment, errMsg message.ErrorMessage)
 	GetCommentByIdSvc(ctx context.Context, commentId uint64) (result Comment, errMsg message.ErrorMessage)
 	UpdateCommentSvc(ctx context.Context, inputMessage string) (result Comment, errMsg message.ErrorMessage)
+	DeleteCommentSvc(ctx context.Context, commentId uint64) (errMsg message.ErrorMessage)
 }

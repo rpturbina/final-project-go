@@ -152,62 +152,62 @@ func (c *CommentHdlImpl) UpdateCommentHdl(ctx *gin.Context) {
 	})
 }
 
-// func (c *CommentHdlImpl) DeleteCommentHdl(ctx *gin.Context) {
-// 	log.Printf("%T - DeleteCommentHdl is invoked\n", c)
-// 	defer log.Printf("%T - DeleteCommentHdl executed\n", c)
+func (c *CommentHdlImpl) DeleteCommentHdl(ctx *gin.Context) {
+	log.Printf("%T - DeleteCommentHdl is invoked\n", c)
+	defer log.Printf("%T - DeleteCommentHdl executed\n", c)
 
-// 	log.Println("check commentId from path parameter")
-// 	commentIdParam := ctx.Param("commentId")
+	log.Println("check commentId from path parameter")
+	commentIdParam := ctx.Param("commentId")
 
-// 	commentId, err := strconv.ParseUint(commentIdParam, 0, 64)
+	commentId, err := strconv.ParseUint(commentIdParam, 0, 64)
 
-// 	if err != nil {
-// 		ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
-// 			"code":    96,
-// 			"type":    "BAD_REQUEST",
-// 			"message": "invalid params",
-// 			"invalid_arg": gin.H{
-// 				"error_type":    "INVALID_PARAMS",
-// 				"error_message": "invalid params",
-// 			},
-// 		})
-// 		return
-// 	}
+	if err != nil {
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+			"code":    96,
+			"type":    "BAD_REQUEST",
+			"message": "invalid params",
+			"invalid_arg": gin.H{
+				"error_type":    "INVALID_PARAMS",
+				"error_message": "invalid params",
+			},
+		})
+		return
+	}
 
-// 	log.Println("calling get comment by id usecase service")
-// 	result, errMsg := c.commentUsecase.GetCommentByIdSvc(ctx, commentId)
+	log.Println("calling get comment by id usecase service")
+	result, errMsg := c.commentUsecase.GetCommentByIdSvc(ctx, commentId)
 
-// 	if errMsg.Error != nil {
-// 		message.ErrorResponseSwitcher(ctx, errMsg)
-// 		return
-// 	}
+	if errMsg.Error != nil {
+		message.ErrorResponseSwitcher(ctx, errMsg)
+		return
+	}
 
-// 	stringUserId := ctx.Value("user").(string)
-// 	userId, _ := strconv.ParseUint(stringUserId, 0, 64)
+	stringUserId := ctx.Value("user").(string)
+	userId, _ := strconv.ParseUint(stringUserId, 0, 64)
 
-// 	log.Println("verify the comment belongs to")
-// 	if result.UserID != userId {
-// 		message.ErrorResponseSwitcher(ctx, message.ErrorMessage{
-// 			Type:  "INVALID_SCOPE",
-// 			Error: errors.New("cannot delete the comment"),
-// 		})
-// 		return
-// 	}
+	log.Println("verify the comment belongs to")
+	if result.UserID != userId {
+		message.ErrorResponseSwitcher(ctx, message.ErrorMessage{
+			Type:  "INVALID_SCOPE",
+			Error: errors.New("cannot delete the comment"),
+		})
+		return
+	}
 
-// 	log.Println("calling delete comment usecase service")
-// 	errMsg = c.commentUsecase.DeleteCommentSvc(ctx, commentId)
+	log.Println("calling delete comment usecase service")
+	errMsg = c.commentUsecase.DeleteCommentSvc(ctx, commentId)
 
-// 	if errMsg.Error != nil {
-// 		message.ErrorResponseSwitcher(ctx, errMsg)
-// 		return
-// 	}
+	if errMsg.Error != nil {
+		message.ErrorResponseSwitcher(ctx, errMsg)
+		return
+	}
 
-// 	ctx.JSON(http.StatusOK, gin.H{
-// 		"code":    01,
-// 		"message": "comment has been successfully deleted",
-// 		"type":    "ACCEPTED",
-// 	})
-// }
+	ctx.JSON(http.StatusOK, gin.H{
+		"code":    01,
+		"message": "comment has been successfully deleted",
+		"type":    "ACCEPTED",
+	})
+}
 
 func NewCommentHandler(commentUsecase comment.CommentUsecase) comment.CommentHandler {
 	return &CommentHdlImpl{commentUsecase: commentUsecase}

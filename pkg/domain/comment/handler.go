@@ -6,5 +6,5 @@ type CommentHandler interface {
 	CreateCommentHdl(ctx *gin.Context)
 	GetCommentsHdl(ctx *gin.Context)
 	UpdateCommentHdl(ctx *gin.Context)
-	// DeleteCommentHdl(ctx *gin.Context)
+	DeleteCommentHdl(ctx *gin.Context)
 }

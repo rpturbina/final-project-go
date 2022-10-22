@@ -27,15 +27,15 @@ func (p *CommentRouterImpl) put() {
 	p.routerGroup.PUT("/:commentId", p.authMiddleware.CheckJWTAuth, p.commentHandler.UpdateCommentHdl)
 }
 
-// func (p *CommentRouterImpl) delete() {
-// 	p.routerGroup.DELETE("/:commentId", p.authMiddleware.CheckJWTAuth, p.commentHandler.DeleteCommentHdl)
-// }
+func (p *CommentRouterImpl) delete() {
+	p.routerGroup.DELETE("/:commentId", p.authMiddleware.CheckJWTAuth, p.commentHandler.DeleteCommentHdl)
+}
 
 func (p *CommentRouterImpl) Routers() {
 	p.get()
 	p.post()
 	p.put()
-	// p.delete()
+	p.delete()
 }
 
 func NewCommentRouter(ginEngine engine.HttpServer, commentHandler comment.CommentHandler, authMiddleware middleware.AuthMiddleware) router.Router {

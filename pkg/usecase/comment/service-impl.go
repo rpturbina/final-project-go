@@ -151,24 +151,24 @@ func (c *CommentUsecaseImpl) UpdateCommentSvc(ctx context.Context, inputMessage 
 	return result, errMsg
 }
 
-// func (c *CommentUsecaseImpl) DeleteCommentSvc(ctx context.Context, commentId uint64) (errMsg message.ErrorMessage) {
-// 	log.Printf("%T - DeleteCommentSvc is invoked\n", c)
-// 	defer log.Printf("%T - DeleteCommentSvc executed\n", c)
+func (c *CommentUsecaseImpl) DeleteCommentSvc(ctx context.Context, commentId uint64) (errMsg message.ErrorMessage) {
+	log.Printf("%T - DeleteCommentSvc is invoked\n", c)
+	defer log.Printf("%T - DeleteCommentSvc executed\n", c)
 
-// 	log.Println("calling delete comment repo")
-// 	err := c.commentRepo.DeleteComment(ctx, commentId)
+	log.Println("calling delete comment repo")
+	err := c.commentRepo.DeleteComment(ctx, commentId)
 
-// 	if err != nil {
-// 		log.Printf("error when fetching data from database: %s\n", err.Error())
-// 		errMsg = message.ErrorMessage{
-// 			Error: err,
-// 			Type:  "INTERNAL_CONNECTION_PROBLEM",
-// 		}
-// 		return errMsg
-// 	}
+	if err != nil {
+		log.Printf("error when fetching data from database: %s\n", err.Error())
+		errMsg = message.ErrorMessage{
+			Error: err,
+			Type:  "INTERNAL_CONNECTION_PROBLEM",
+		}
+		return errMsg
+	}
 
-// 	return errMsg
-// }
+	return errMsg
+}
 
 func NewCommentUsecase(commentRepo comment.CommentRepo, photoUsecase photo.PhotoUsecase) comment.CommentUsecase {
 	return &CommentUsecaseImpl{commentRepo: commentRepo, photoUsecase: photoUsecase}

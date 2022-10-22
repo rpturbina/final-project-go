@@ -77,20 +77,20 @@ func (c *CommentRepoImpl) UpdateComment(ctx context.Context, inputMessage string
 	return result, err
 }
 
-// func (c *CommentRepoImpl) DeleteComment(ctx context.Context, photoId uint64) (err error) {
-// 	log.Printf("%T - DeleteComment is invoked\n", c)
-// 	defer log.Printf("%T - DeleteComment executed\n", c)
+func (c *CommentRepoImpl) DeleteComment(ctx context.Context, commentId uint64) (err error) {
+	log.Printf("%T - DeleteComment is invoked\n", c)
+	defer log.Printf("%T - DeleteComment executed\n", c)
 
-// 	db := c.pgCln.GetClient()
+	db := c.pgCln.GetClient()
 
-// 	err = db.Where("id = ?", photoId).Delete(&photo.Comment{}).Error
+	err = db.Where("id = ?", commentId).Delete(&comment.Comment{}).Error
 
-// 	if err != nil {
-// 		log.Printf("error when deleting photo by id %v \n", photoId)
-// 	}
+	if err != nil {
+		log.Printf("error when deleting comment by id %v \n", commentId)
+	}
 
-// 	return err
-// }
+	return err
+}
 
 func NewCommentRepo(pgCln postgres.PostgresClient) comment.CommentRepo {
 	return &CommentRepoImpl{pgCln: pgCln}
