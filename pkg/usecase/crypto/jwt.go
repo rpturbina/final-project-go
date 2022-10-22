@@ -2,13 +2,15 @@ package crypto
 
 import (
 	"context"
+	"os"
 
 	"github.com/kataras/jwt"
 	"github.com/rpturbina/final-project-go/pkg/domain/claim"
 )
 
 var (
-	sharedKey = []byte("sercrethatmaycontainch@r$32chars")
+	envSharedKey = os.Getenv("MY_GRAM_SECRET_JWT_SIGNATURE")
+	sharedKey    = []byte(envSharedKey)
 )
 
 func CreateJWT(ctx context.Context, claim any) (string, error) {

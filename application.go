@@ -2,9 +2,11 @@ package main
 
 import (
 	"net/http"
+	"os"
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/joho/godotenv"
 	engine "github.com/rpturbina/final-project-go/config/gin"
 	"github.com/rpturbina/final-project-go/config/postgres"
 	authrepo "github.com/rpturbina/final-project-go/pkg/repository/auth"
@@ -23,13 +25,23 @@ import (
 	userusecase "github.com/rpturbina/final-project-go/pkg/usecase/user"
 )
 
+func init() {
+	godotenv.Load(".env")
+}
+
 func main() {
+	postgresHost := os.Getenv("MY_GRAM_POSTGRES_HOST")
+	postgresPort := os.Getenv("MY_GRAM_POSTGRES_PORT")
+	postgresDatabase := os.Getenv("MY_GRAM_POSTGRES_DATABASE")
+	postgresUsername := os.Getenv("MY_GRAM_POSTGRES_USERNAME")
+	postgresPassword := os.Getenv("MY_GRAM_POSTGRES_PASSWORD")
+
 	postgresCln := postgres.NewPostgresConnection(postgres.Config{
-		Host:         "localhost",
-		Port:         "5432",
-		User:         "postgres",
-		Password:     "mysecretpassword",
-		DatabaseName: "mygram",
+		Host:         postgresHost,
+		Port:         postgresPort,
+		User:         postgresUsername,
+		Password:     postgresPassword,
+		DatabaseName: postgresDatabase,
 	})
 
 	ginEngine := engine.NewGinHttp(engine.Config{
