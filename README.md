@@ -38,13 +38,13 @@ These instructions will get you a copy of the project up and running on your loc
 
 Before you run this project, you must run these commands below
 
-```go
+```golang
 go mod download && go mod tidy
 ```
 
 To test this project, you need to have Go in your local and run command below
 
-```go
+```golang
 go run application.go
 ```
 
